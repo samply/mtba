@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>de.samply</groupId>
+    <artifactId>parent</artifactId>
+    <version>11.1.1</version>
+  </parent>
+
+  <artifactId>mtba</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>mtba</name>
+  <description>Samply MTBA is a library for the functionality of the project MTBA (Molecular Tumor Board Association)</description>
+  <url>https://github.com/samply/mtba</url>
+
+  <organization>
+    <name>Samply Community</name>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+
+    <developer>
+      <name>David Juárez</name>
+      <email>d.juarez@dkfz-heidelberg.de</email>
+      <organization>German Cancer Research Center</organization>
+      <organizationUrl>https://www.dkfz.de/en/</organizationUrl>
+    </developer>
+
+    <developer>
+      <name>Pierre Delpy</name>
+      <email>p.delpy@dkfz-heidelberg.de</email>
+      <organization>German Cancer Research Center</organization>
+      <organizationUrl>https://www.dkfz.de/en/</organizationUrl>
+    </developer>
+
+    <developer>
+      <name>Dennis Grimm</name>
+      <email>dennis.grimm@dkfz-heidelberg.de</email>
+      <organization>German Cancer Research Center</organization>
+      <organizationUrl>https://www.dkfz.de/en/</organizationUrl>
+    </developer>
+
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/samply/mtba.git</connection>
+    <developerConnection>scm:git:https://github.com/samply/mtba.git</developerConnection>
+    <url>https://github.com/samply/mtba</url>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <properties>
+    <!--<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
+
+    <junit.version>4.11</junit.version>
+    <commons-csv.version>1.4</commons-csv.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
+      <version>${commons-csv.version}</version>
+    </dependency>
+  </dependencies>
+
+
+</project>
