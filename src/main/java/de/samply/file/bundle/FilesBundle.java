@@ -4,10 +4,11 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class FilesBundle {
 
-  private Map<String, File> files = new HashMap<>();
+  private final Map<String, File> files = new HashMap<>();
 
   /**
    * Add file to bundle.
@@ -36,6 +37,33 @@ public class FilesBundle {
    */
   public File getFile(String filename) {
     return files.get(filename);
+  }
+
+  /**
+   * Apply FileConsumer to file filename.
+   * @param fileConsumer file consumer.
+   * @param filename filename.
+   */
+  public void applyToFile(Consumer<File> fileConsumer, String filename){
+
+    File file = getFile(filename);
+    if (file != null && fileConsumer != null){
+      fileConsumer.accept(file);
+    }
+
+  }
+
+  /**
+   * Apply file consumer to all files
+   * @param fileConsumer file consumer
+   */
+  public void applyToAllFiles(Consumer<File> fileConsumer){
+
+    if (fileConsumer != null){
+      for (File file : getAllFiles()) {
+        fileConsumer.accept(file);
+      }
+    }
   }
 
 }
