@@ -64,19 +64,12 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
 
   @Override
   public void movePathsBundleToOutputFolder(PathsBundle pathsBundle) throws PathsBundleException {
-    try {
-      movePathsBundleToOutputFolder_WithoutManagementException(pathsBundle);
-    } catch (IOException e) {
-      throw new PathsBundleException(e);
-    }
-  }
 
-  private void movePathsBundleToOutputFolder_WithoutManagementException(PathsBundle pathsBundle)
-      throws IOException {
-
-    for (Path path : pathsBundle.getAllPaths()) {
-      Files.move(path, outputFolderPath.resolve(path.getFileName()),
-          StandardCopyOption.REPLACE_EXISTING);
+    if (pathsBundle != null) {
+      pathsBundle
+          .applyToAllPaths(
+              path -> Files.move(path, outputFolderPath.resolve(path.getFileName()),
+                  StandardCopyOption.REPLACE_EXISTING));
     }
 
   }

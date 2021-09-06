@@ -91,6 +91,7 @@ public class PathsBundle {
           .forEach(either -> logger
               .error("Exception while applying consumer to file", (Exception) either.getLeft()));
     }
+
   }
 
 }
