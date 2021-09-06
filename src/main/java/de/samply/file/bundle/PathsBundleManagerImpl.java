@@ -23,11 +23,11 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
   }
 
   @Override
-  public boolean isNextPathsBundleInInputFolder() throws PathsBundleException {
+  public boolean isNextPathsBundleInInputFolder() throws PathsBundleManagerException {
     try {
       return isNextPathsBundleInInputFolder_WithoutManagementException();
     } catch (IOException e) {
-      throw new PathsBundleException(e);
+      throw new PathsBundleManagerException(e);
     }
   }
 
@@ -37,16 +37,16 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
   }
 
   @Override
-  public PathsBundle fetchNextPathsBundleFromInputFolder() throws PathsBundleException {
+  public PathsBundle fetchNextPathsBundleFromInputFolder() throws PathsBundleManagerException {
     try {
       return fetchNextPathsBundleFromInputFolder_WithoutManagementException();
     } catch (IOException e) {
-      throw new PathsBundleException(e);
+      throw new PathsBundleManagerException(e);
     }
   }
 
   private PathsBundle fetchNextPathsBundleFromInputFolder_WithoutManagementException()
-      throws PathsBundleException, IOException {
+      throws PathsBundleManagerException, IOException {
 
     PathsBundle pathsBundle = null;
 
@@ -63,16 +63,22 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
   }
 
   @Override
-  public void movePathsBundleToOutputFolder(PathsBundle pathsBundle) throws PathsBundleException {
+  public void movePathsBundleToOutputFolder(PathsBundle pathsBundle)
+      throws PathsBundleManagerException {
 
     if (pathsBundle != null) {
-      pathsBundle
-          .applyToAllPaths(
-              path -> Files.move(path, outputFolderPath.resolve(path.getFileName()),
-                  StandardCopyOption.REPLACE_EXISTING));
+      pathsBundle.applyToAllPaths(path -> moveFileToOutputFolder(path));
     }
 
   }
 
+  protected void moveFileToOutputFolder(Path path) throws PathsBundleManagerException {
+    try {
+      Files.move(path, outputFolderPath.resolve(path.getFileName()),
+          StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      throw new PathsBundleManagerException(e);
+    }
+  }
 
 }

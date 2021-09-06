@@ -79,6 +79,7 @@
     <commons-io.version>2.11.0</commons-io.version>
     <vavr.version>0.10.4</vavr.version>
     <log4j-api.version>2.14.1</log4j-api.version>
+    <commons-net.version>3.8.0</commons-net.version>
   </properties>
 
   <dependencies>
@@ -112,6 +113,11 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
       <version>${log4j-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+      <version>${commons-net.version}</version>
     </dependency>
   </dependencies>
 

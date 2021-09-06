@@ -2,10 +2,10 @@ package de.samply.file.bundle;
 
 public interface PathsBundleManager {
 
-  boolean isNextPathsBundleInInputFolder() throws PathsBundleException;
+  boolean isNextPathsBundleInInputFolder() throws PathsBundleManagerException;
 
-  PathsBundle fetchNextPathsBundleFromInputFolder() throws PathsBundleException;
+  PathsBundle fetchNextPathsBundleFromInputFolder() throws PathsBundleManagerException;
 
-  void movePathsBundleToOutputFolder(PathsBundle pathsBundle) throws PathsBundleException;
+  void movePathsBundleToOutputFolder(PathsBundle pathsBundle) throws PathsBundleManagerException;
 
 }
