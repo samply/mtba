@@ -8,3 +8,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Quick Start
 - Files Bundle, Files Bundle Manager
+- SLF4J with log4j

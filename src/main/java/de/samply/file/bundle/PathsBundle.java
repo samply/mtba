@@ -1,14 +1,21 @@
 package de.samply.file.bundle;
 
+import de.samply.utils.EitherUtils;
+import de.samply.utils.EitherUtils.ThrowingConsumer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PathsBundle {
 
+
+  private final Logger logger = LoggerFactory.getLogger(PathsBundle.class);
   private final Map<String, Path> pathMap = new HashMap<>();
 
   /**
@@ -64,14 +71,37 @@ public class PathsBundle {
    *
    * @param pathConsumer path consumer
    */
-  public void applyToAllPaths(Consumer<Path> pathConsumer) {
+  public <E extends Exception> void applyToAllPaths(ThrowingConsumer<Path, E> pathConsumer) {
 
     if (pathConsumer != null) {
-      for (Path path : getAllPaths()) {
-        pathConsumer.accept(path);
-      }
+      getAllPaths()
+          .stream()
+          .map(EitherUtils.liftConsumer(path -> pathConsumer.accept(path)))
+          .filter(Objects::nonNull)
+          .forEach(either -> logger
+              .error("Exception while applying consumer to file", (Exception) either.getLeft()));
     }
   }
+
+  /*
+
+  public static void main(String[] args) {
+
+    PathsBundle pathsBundle = new PathsBundle();
+    String text = args[1];
+
+    pathsBundle.applyToAllPaths(path -> {
+          if (text == null) {
+            System.out.println("hello");
+          } else {
+            throw new Exception("nein");
+          }
+        }
+    );
+  }
+
+  */
+
 
 
 }
