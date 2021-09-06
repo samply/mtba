@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +56,8 @@ public class PathsBundle {
    * @param pathConsumer file consumer.
    * @param filename     filename.
    */
-  public <E extends Exception> void applyToPath(ThrowingConsumer<Path, E> pathConsumer, String filename)
+  public <E extends Exception> void applyToPath(ThrowingConsumer<Path, E> pathConsumer,
+      String filename)
       throws PathsBundleException {
     try {
       applyToPath_WithoutManagementException(pathConsumer, filename);
@@ -66,7 +66,8 @@ public class PathsBundle {
     }
   }
 
-  private <E extends Exception> void applyToPath_WithoutManagementException(ThrowingConsumer<Path, E> pathConsumer, String filename)
+  private <E extends Exception> void applyToPath_WithoutManagementException(
+      ThrowingConsumer<Path, E> pathConsumer, String filename)
       throws Exception {
     Path path = getPath(filename);
     if (path != null && pathConsumer != null) {
@@ -110,7 +111,6 @@ public class PathsBundle {
   }
 
   */
-
 
 
 }
