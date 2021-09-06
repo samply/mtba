@@ -93,24 +93,4 @@ public class PathsBundle {
     }
   }
 
-  /*
-
-  public static void main(String[] args) {
-
-    PathsBundle pathsBundle = new PathsBundle();
-    String text = args[1];
-
-    pathsBundle.applyToAllPaths(path -> {
-          if (text == null) {
-            System.out.println("hello");
-          } else {
-            throw new Exception("nein");
-          }
-        }
-    );
-  }
-
-  */
-
-
 }
