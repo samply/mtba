@@ -57,14 +57,23 @@ public class PathsBundle {
    * @param pathConsumer file consumer.
    * @param filename     filename.
    */
-  public void applyToPath(Consumer<Path> pathConsumer, String filename) {
+  public <E extends Exception> void applyToPath(ThrowingConsumer<Path, E> pathConsumer, String filename)
+      throws PathsBundleException {
+    try {
+      applyToPath_WithoutManagementException(pathConsumer, filename);
+    } catch (Exception e) {
+      throw new PathsBundleException(e);
+    }
+  }
 
+  private <E extends Exception> void applyToPath_WithoutManagementException(ThrowingConsumer<Path, E> pathConsumer, String filename)
+      throws Exception {
     Path path = getPath(filename);
     if (path != null && pathConsumer != null) {
       pathConsumer.accept(path);
     }
-
   }
+
 
   /**
    * Apply path consumer to all paths.
