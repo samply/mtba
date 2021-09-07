@@ -1,10 +1,10 @@
-package de.samply.file.csv.reader;
+package de.samply.file.csv;
 
 import java.util.Iterator;
 import java.util.Set;
 import org.apache.commons.csv.CSVRecord;
 
-public class CsvRecordHeaderValueIterator implements Iterator<CsvRecordHeaderValueMap> {
+public class CsvRecordHeaderValueIterator implements Iterator<CsvRecordHeaderValue> {
 
   private Iterator<CSVRecord> csvRecordIterator;
   private Set<String> csvRecordHeaders;
@@ -22,8 +22,8 @@ public class CsvRecordHeaderValueIterator implements Iterator<CsvRecordHeaderVal
   }
 
   @Override
-  public CsvRecordHeaderValueMap next() {
-    return new CsvRecordHeaderValueMap(csvRecordHeaders, csvRecordIterator.next());
+  public CsvRecordHeaderValue next() {
+    return new CsvRecordHeaderValue(csvRecordHeaders, csvRecordIterator.next());
   }
 
 }

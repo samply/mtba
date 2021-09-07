@@ -1,5 +1,7 @@
 package de.samply.file.csv.reader;
 
+import de.samply.file.csv.CsvRecordHeaderValue;
+import de.samply.file.csv.CsvRecordHeaderValueIterator;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -19,7 +21,7 @@ public class CsvReader {
    * @return iterator of header-values of csv records.
    * @throws CsvReaderException exception that encapsulates all exceptions within the class.
    */
-  public Iterator<CsvRecordHeaderValueMap> fetchCsvRecordHeaderValues(
+  public Iterator<CsvRecordHeaderValue> fetchCsvRecordHeaderValues(
       CsvReaderParameters csvReaderParameters) throws CsvReaderException {
 
     return (csvReaderParameters != null && csvReaderParameters.getFilename() != null
@@ -29,7 +31,7 @@ public class CsvReader {
 
   }
 
-  private Iterator<CsvRecordHeaderValueMap> fetchCsvRecordHeaderValues_WithoutCheck(
+  private Iterator<CsvRecordHeaderValue> fetchCsvRecordHeaderValues_WithoutCheck(
       CsvReaderParameters csvReaderParameters) throws CsvReaderException {
 
     Iterator<CSVRecord> iterator = fetchCsvRecords(csvReaderParameters).iterator();
@@ -58,6 +60,8 @@ public class CsvReader {
     return CSVFormat.DEFAULT
         .withHeader(headers)
         .withFirstRecordAsHeader()
+        .withIgnoreEmptyLines()
+        .withIgnoreHeaderCase()
         .parse(reader);
 
   }
