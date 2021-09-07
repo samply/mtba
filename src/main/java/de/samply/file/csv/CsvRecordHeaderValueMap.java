@@ -31,7 +31,7 @@ public class CsvRecordHeaderValueMap {
     return headerValueMap;
   }
 
-  public Collection<String> getValues(String header) {
+  public Collection<String> getValue(String header) {
     return getHeaderValueMap().values();
   }
 
