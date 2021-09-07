@@ -14,8 +14,9 @@ public class FtpPathsBundleManager extends PathsBundleManagerImpl implements Pat
 
   /**
    * Moves paths bundle to external directory through FTP.
-   *
-   * @param inputFolderPath input folder path.
+   * @param inputFolderPath source input folder path.
+   * @param outputFolderPath output folder path in ftp server.
+   * @param ftpServerConfig ftp server configuration.
    */
   public FtpPathsBundleManager(String inputFolderPath, String outputFolderPath,
       FtpServerConfig ftpServerConfig) {
