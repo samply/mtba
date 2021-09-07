@@ -10,3 +10,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - SLF4J with log4j
 - FTP Client
 - CSV Reader
+- CSV Writer
