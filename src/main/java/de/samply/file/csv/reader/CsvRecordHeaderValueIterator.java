@@ -1,4 +1,4 @@
-package de.samply.file.csv;
+package de.samply.file.csv.reader;
 
 import java.util.Iterator;
 import java.util.Set;

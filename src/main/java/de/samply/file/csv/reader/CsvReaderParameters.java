@@ -1,4 +1,4 @@
-package de.samply.file.csv;
+package de.samply.file.csv.reader;
 
 import de.samply.file.bundle.PathsBundle;
 import java.util.HashSet;
