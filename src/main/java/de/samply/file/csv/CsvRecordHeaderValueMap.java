@@ -11,7 +11,7 @@ public class CsvRecordHeaderValueMap {
   private Map<String, String> headerValueMap = new HashMap<>();
 
   /**
-   * Values of a csv record under specified headers.
+   * Values of a csv record for specified headers.
    *
    * @param headers   headers to be considered in csv record.
    * @param csvRecord csv record where the information is extracted.
