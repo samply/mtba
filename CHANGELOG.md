@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.0 - 2021-09-06]
 ### Added
-- Quick Start
-- Files Bundle, Files Bundle Manager
+- Paths Bundle, Paths Bundle Manager
 - SLF4J with log4j
 - FTP Client
+- CSV Reader
