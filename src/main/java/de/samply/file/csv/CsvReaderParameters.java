@@ -14,7 +14,7 @@ public class CsvReaderParameters {
     return headers;
   }
 
-  public void addHeader (String header){
+  public void addHeader(String header) {
     headers.add(header);
   }
 
