@@ -6,6 +6,7 @@ public class FtpServerConfig {
   private int port;
   private String user;
   private String password;
+  private ProxyConfig proxyConfig;
 
   public String getHostname() {
     return hostname;
@@ -37,6 +38,14 @@ public class FtpServerConfig {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public ProxyConfig getProxyConfig() {
+    return proxyConfig;
+  }
+
+  public void setProxyConfig(ProxyConfig proxyConfig) {
+    this.proxyConfig = proxyConfig;
   }
 
 }

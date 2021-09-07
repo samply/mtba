@@ -8,8 +8,8 @@ import java.nio.file.StandardCopyOption;
 
 public class PathsBundleManagerImpl implements PathsBundleManager {
 
-  private Path inputFolderPath;
-  private Path outputFolderPath;
+  protected Path inputFolderPath;
+  protected Path outputFolderPath;
 
   /**
    * The current implementation assumes that there is only one bundle in the whole directory.

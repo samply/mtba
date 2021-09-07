@@ -1,9 +1,10 @@
 package de.samply.file.bundle;
 
+import de.samply.file.ftp.FtpClientCloseable;
 import de.samply.file.ftp.FtpServerConfig;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -16,8 +17,9 @@ public class FtpPathsBundleManager extends PathsBundleManagerImpl implements Pat
    *
    * @param inputFolderPath input folder path.
    */
-  public FtpPathsBundleManager(String inputFolderPath, FtpServerConfig ftpServerConfig) {
-    super(inputFolderPath, null);
+  public FtpPathsBundleManager(String inputFolderPath, String outputFolderPath,
+      FtpServerConfig ftpServerConfig) {
+    super(inputFolderPath, outputFolderPath);
     this.ftpServerConfig = ftpServerConfig;
 
   }
@@ -25,7 +27,7 @@ public class FtpPathsBundleManager extends PathsBundleManagerImpl implements Pat
   @Override
   protected void moveFileToOutputFolder(Path path) throws PathsBundleManagerException {
 
-    try (FtpClientCloseable ftpClientCloseable = new FtpClientCloseable()) {
+    try (FtpClientCloseable ftpClientCloseable = new FtpClientCloseable(ftpServerConfig)) {
       moveFileToOutputFolder(ftpClientCloseable.getFtpClient(), path);
     } catch (IOException e) {
       throw new PathsBundleManagerException(e);
@@ -34,49 +36,19 @@ public class FtpPathsBundleManager extends PathsBundleManagerImpl implements Pat
   }
 
   private void moveFileToOutputFolder(FTPClient ftpClient, Path path)
+      throws PathsBundleManagerException {
+
+    try (InputStream pathInputStream = Files.newInputStream(path)) {
+      moveFileToOutputFolder(ftpClient, pathInputStream);
+    } catch (IOException e) {
+      throw new PathsBundleManagerException(e);
+    }
+
+  }
+
+  private void moveFileToOutputFolder(FTPClient ftpClient, InputStream pathInputStream)
       throws IOException {
-
-    //TODO
-    String remoteUrl = null;
-    InputStream local = null;
-    ftpClient.storeFile(remoteUrl, local);
-
-  }
-
-  private String getRemoteUrl() {
-    //TODO
-    return null;
-  }
-
-  private class FtpClientCloseable implements Closeable {
-
-    FTPClient ftpClient;
-
-    public FtpClientCloseable() throws IOException {
-      this.ftpClient = new FTPClient();
-      connect();
-      login();
-    }
-
-    private void connect() throws IOException {
-      ftpClient.connect(ftpServerConfig.getHostname(), ftpServerConfig.getPort());
-    }
-
-    private void login() throws IOException {
-      ftpClient.login(ftpServerConfig.getUser(), ftpServerConfig.getPassword());
-    }
-
-    public FTPClient getFtpClient() {
-      return ftpClient;
-    }
-
-    @Override
-    public void close() throws IOException {
-      if (ftpClient != null && ftpClient.isConnected()) {
-        ftpClient.disconnect();
-      }
-    }
-
+    ftpClient.storeFile(outputFolderPath.toString(), pathInputStream);
   }
 
 }
