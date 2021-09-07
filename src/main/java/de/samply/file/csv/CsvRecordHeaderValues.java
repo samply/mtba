@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.csv.CSVRecord;
 
-public class CsvRecordHeaderValue {
+public class CsvRecordHeaderValues {
 
   private Map<String, String> headerValueMap = new HashMap<>();
 
@@ -16,7 +16,7 @@ public class CsvRecordHeaderValue {
    * @param headers   headers to be considered in csv record.
    * @param csvRecord csv record where the information is extracted.
    */
-  public CsvRecordHeaderValue(Set<String> headers, CSVRecord csvRecord) {
+  public CsvRecordHeaderValues(Set<String> headers, CSVRecord csvRecord) {
 
     for (String header : headers) {
       String value = csvRecord.get(header);
@@ -31,8 +31,8 @@ public class CsvRecordHeaderValue {
     return headerValueMap;
   }
 
-  public Collection<String> getValue(String header) {
-    return getHeaderValueMap().values();
+  public String getValue(String header) {
+    return getHeaderValueMap().get(header);
   }
 
 }
