@@ -72,8 +72,6 @@
   </distributionManagement>
 
   <properties>
-    <!--<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
-
     <junit.version>4.11</junit.version>
     <commons-csv.version>1.4</commons-csv.version>
     <commons-io.version>2.11.0</commons-io.version>
