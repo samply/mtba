@@ -11,3 +11,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - FTP Client
 - CSV Reader
 - CSV Writer
+- CSV Updater
