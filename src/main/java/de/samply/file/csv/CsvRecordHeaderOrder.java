@@ -15,10 +15,19 @@ public class CsvRecordHeaderOrder {
     headerOrderMap.put(header, order);
   }
 
+  /**
+   * Get predefined order of header.
+   * @param header header.
+   * @return header order.
+   */
   public Integer getOrder(String header) {
     return headerOrderMap.get(header);
   }
 
+  /**
+   * Get list of headers in order.
+   * @return list of headers in order.
+   */
   public List<String> getHeadersInOrder() {
 
     if (headersInOrder == null) {

@@ -19,7 +19,15 @@ public class CsvWriter implements Closeable {
   private CsvRecordHeaderOrder csvRecordHeaderOrder;
   private Path outputPath;
   private CSVPrinter csvPrinter;
+  private int maxNumberOfRowsForFlush = 100;
+  private int flushCounter = 0;
 
+  /**
+   * Writes csv records in csv file.
+   *
+   * @param csvWriterParameters csv writer parameters.
+   * @throws CsvWriterException exception that encapsulates internal exceptions.
+   */
   public CsvWriter(CsvWriterParameters csvWriterParameters) throws CsvWriterException {
 
     this.csvRecordHeaderOrder = csvWriterParameters.getCsvRecordHeaderOrder();
@@ -57,6 +65,17 @@ public class CsvWriter implements Closeable {
 
     String[] values = fetchValuesInOrder(csvRecordHeaderValues);
     csvPrinter.printRecord(values);
+    flush();
+
+  }
+
+  private void flush() throws IOException {
+
+    flushCounter++;
+    if (flushCounter >= maxNumberOfRowsForFlush) {
+      csvPrinter.flush();
+      flushCounter = 0;
+    }
 
   }
 
@@ -107,6 +126,7 @@ public class CsvWriter implements Closeable {
   @Override
   public void close() throws IOException {
     if (csvPrinter != null) {
+      csvPrinter.flush();
       csvPrinter.close();
     }
   }

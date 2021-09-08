@@ -5,6 +5,7 @@ import de.samply.file.csv.CsvRecordHeaderOrder;
 public class CsvWriterFactory {
 
   private String outputFolderPath;
+  private Integer maxNumberOfRowsPerFlush = 100;
 
   /**
    * Generates csv writers.
@@ -14,6 +15,18 @@ public class CsvWriterFactory {
   public CsvWriterFactory(String outputFolderPath) {
     this.outputFolderPath = outputFolderPath;
   }
+
+  /**
+   * Generates csv writers.
+   *
+   * @param outputFolderPath        output folder path.
+   * @param maxNumberOfRowsPerFlush maximal number of rows to be written per flush.
+   */
+  public CsvWriterFactory(String outputFolderPath, Integer maxNumberOfRowsPerFlush) {
+    this.outputFolderPath = outputFolderPath;
+    this.maxNumberOfRowsPerFlush = maxNumberOfRowsPerFlush;
+  }
+
 
   /**
    * Generate csv writer.

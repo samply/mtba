@@ -7,6 +7,15 @@ public class CsvWriterParameters {
   private CsvRecordHeaderOrder csvRecordHeaderOrder;
   private String outputFolderPath;
   private String outputFilename;
+  private Integer maxNumberOfRowsForFlush;
+
+  public Integer getMaxNumberOfRowsForFlush() {
+    return maxNumberOfRowsForFlush;
+  }
+
+  public void setMaxNumberOfRowsForFlush(Integer maxNumberOfRowsForFlush) {
+    this.maxNumberOfRowsForFlush = maxNumberOfRowsForFlush;
+  }
 
   public CsvRecordHeaderOrder getCsvRecordHeaderOrder() {
     return csvRecordHeaderOrder;
