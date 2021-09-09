@@ -7,24 +7,29 @@ import java.util.Map;
 public class PivotedCsvRecordHeaderValues {
 
   private String pivotHeader;
-  private Map<String, CsvRecordHeaderValues> pivotValue_headervaluesMap = new HashMap<>();
+  private Map<String, CsvRecordHeaderValues> pivotValueTOheaderValuesMap = new HashMap<>();
 
   public PivotedCsvRecordHeaderValues(String pivotHeader) {
     this.pivotHeader = pivotHeader;
   }
 
+  /**
+   * Add csv record header values.
+   *
+   * @param csvRecordHeaderValues csv record header values.
+   */
   public void addCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues) {
 
     if (pivotHeader != null && csvRecordHeaderValues != null
         && csvRecordHeaderValues.getValue(pivotHeader) != null) {
       String pivotValue = csvRecordHeaderValues.getValue(pivotHeader);
-      pivotValue_headervaluesMap.put(pivotValue, csvRecordHeaderValues);
+      pivotValueTOheaderValuesMap.put(pivotValue, csvRecordHeaderValues);
     }
 
   }
 
-  public CsvRecordHeaderValues getCsvRecordHeaderValues (String pivotValue){
-    return pivotValue_headervaluesMap.get(pivotValue);
+  public CsvRecordHeaderValues getCsvRecordHeaderValues(String pivotValue) {
+    return pivotValueTOheaderValuesMap.get(pivotValue);
   }
 
 }
