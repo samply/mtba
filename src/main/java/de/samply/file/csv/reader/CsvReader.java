@@ -24,8 +24,7 @@ public class CsvReader {
   public static Iterator<CsvRecordHeaderValues> fetchCsvRecordHeaderValues(
       CsvReaderParameters csvReaderParameters) throws CsvReaderException {
 
-    return (csvReaderParameters != null && csvReaderParameters.getFilename() != null
-        && csvReaderParameters.getPathsBundle() != null)
+    return (csvReaderParameters != null && csvReaderParameters.getPath() != null)
         ? fetchCsvRecordHeaderValues_WithoutCheck(csvReaderParameters)
         : Collections.emptyIterator();
 
@@ -56,9 +55,13 @@ public class CsvReader {
       Reader reader)
       throws IOException {
 
-    String[] headers = (String[]) csvReaderParameters.getHeaders().toArray();
-    return CSVFormat.DEFAULT
-        .withHeader(headers)
+    CSVFormat csvFormat = CSVFormat.DEFAULT;
+    if (!csvReaderParameters.readAllHeaders()) {
+      String[] headers = (String[]) csvReaderParameters.getHeaders().toArray();
+      csvFormat = csvFormat.withHeader(headers);
+    }
+
+    return csvFormat
         .withFirstRecordAsHeader()
         .withIgnoreEmptyLines()
         .withIgnoreHeaderCase()
@@ -68,8 +71,7 @@ public class CsvReader {
 
   private static Reader createReader(CsvReaderParameters csvReaderParameters) throws IOException {
 
-    String filename = csvReaderParameters.getFilename();
-    Path path = csvReaderParameters.getPathsBundle().getPath(filename);
+    Path path = csvReaderParameters.getPath();
     return Files.newBufferedReader(path);
 
   }

@@ -1,6 +1,7 @@
 package de.samply.file.csv.reader;
 
 import de.samply.file.bundle.PathsBundle;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,6 +37,19 @@ public class CsvReaderParameters {
 
   public void setPathsBundle(PathsBundle pathsBundle) {
     this.pathsBundle = pathsBundle;
+  }
+
+  /**
+   * If no headers are provided, all columns should be read.
+   *
+   * @return boolean: should all headers be read?
+   */
+  public boolean readAllHeaders() {
+    return headers.size() == 0;
+  }
+
+  public Path getPath() {
+    return (pathsBundle != null && filename != null) ? pathsBundle.getPath(filename) : null;
   }
 
 }

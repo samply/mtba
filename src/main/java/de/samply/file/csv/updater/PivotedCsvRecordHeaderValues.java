@@ -32,4 +32,8 @@ public class PivotedCsvRecordHeaderValues {
     return pivotValueTOheaderValuesMap.get(pivotValue);
   }
 
+  public String getPivotHeader() {
+    return pivotHeader;
+  }
+
 }
