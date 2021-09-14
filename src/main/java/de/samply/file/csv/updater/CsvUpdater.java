@@ -47,7 +47,7 @@ public class CsvUpdater {
    * @param csvRecordHeaderValues csv record header values.
    * @throws CsvUpdaterException exception that encapsulates internal exceptions.
    */
-  public void addCsvRecordHeaderValues(
+  public void addPivotedCsvRecordHeaderValues(
       PivotedCsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
 
     addCsvRecordHeaderValues_WithoutInputAndOutputMerge(csvRecordHeaderValues);
@@ -58,8 +58,7 @@ public class CsvUpdater {
   /**
    * First approach: 1. Modify input and write changes in output. 2. Delete input file. 3. Rename
    * output as input.
-   * <p>
-   * TODO: Do not delete input file: Rename it and send it to SUCCESSFUL or ERROR folder.
+   * <p>TODO: Do not delete input file: Rename it and send it to SUCCESSFUL or ERROR folder.</p>
    */
   private void mergeInputAndOutputPath() throws CsvUpdaterException {
     try {
