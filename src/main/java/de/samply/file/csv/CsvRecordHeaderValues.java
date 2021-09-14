@@ -2,6 +2,7 @@ package de.samply.file.csv;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.commons.csv.CSVRecord;
 
@@ -32,6 +33,17 @@ public class CsvRecordHeaderValues {
 
   public String getValue(String header) {
     return getHeaderValueMap().get(header);
+  }
+
+  /**
+   * Merges current csv record header value with input.
+   *
+   * @param csvRecordHeaderValues csv record header values.
+   */
+  public void merge(CsvRecordHeaderValues csvRecordHeaderValues) {
+    for (Entry<String, String> entry : csvRecordHeaderValues.getHeaderValueMap().entrySet()) {
+      headerValueMap.put(entry.getKey(), entry.getValue());
+    }
   }
 
 }

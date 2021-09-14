@@ -15,8 +15,14 @@ public class CsvRecordHeaderOrder {
     headerOrderMap.put(header, order);
   }
 
+  public void addHeaderAtLastPosition(String header) {
+    Integer maxHeaderOrder = getMaxHeaderOrder();
+    addHeader(header, maxHeaderOrder + 1);
+  }
+
   /**
    * Get predefined order of header.
+   *
    * @param header header.
    * @return header order.
    */
@@ -26,6 +32,7 @@ public class CsvRecordHeaderOrder {
 
   /**
    * Get list of headers in order.
+   *
    * @return list of headers in order.
    */
   public List<String> getHeadersInOrder() {
@@ -82,4 +89,14 @@ public class CsvRecordHeaderOrder {
 
   }
 
+  private Integer getMaxHeaderOrder() {
+    int maxOrder = 0;
+    for (Integer order : headerOrderMap.values()) {
+      if (order != null && order > maxOrder) {
+        maxOrder = order;
+      }
+    }
+
+    return maxOrder;
+  }
 }

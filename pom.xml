@@ -73,7 +73,7 @@
 
   <properties>
     <junit.version>4.11</junit.version>
-    <commons-csv.version>1.4</commons-csv.version>
+    <commons-csv.version>1.9.0</commons-csv.version>
     <commons-io.version>2.11.0</commons-io.version>
     <vavr.version>0.10.4</vavr.version>
     <log4j-api.version>2.14.1</log4j-api.version>
