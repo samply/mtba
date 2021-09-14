@@ -11,6 +11,10 @@ import de.samply.file.csv.writer.CsvWriterFactoryException;
 import de.samply.file.csv.writer.CsvWriterParameters;
 import de.samply.utils.EitherUtils;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +43,43 @@ public class CsvUpdater {
 
   /**
    * Add csv record header values to file.
+   *
    * @param csvRecordHeaderValues csv record header values.
    * @throws CsvUpdaterException exception that encapsulates internal exceptions.
    */
   public void addCsvRecordHeaderValues(
+      PivotedCsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
+
+    addCsvRecordHeaderValues_WithoutInputAndOutputMerge(csvRecordHeaderValues);
+    mergeInputAndOutputPath();
+
+  }
+
+  /**
+   * First approach: 1. Modify input and write changes in output. 2. Delete input file. 3. Rename
+   * output as input.
+   * <p>
+   * TODO: Do not delete input file: Rename it and send it to SUCCESSFUL or ERROR folder.
+   */
+  private void mergeInputAndOutputPath() throws CsvUpdaterException {
+    try {
+      mergeInputAndOutputPath_WithoutManageExceptions();
+    } catch (IOException e) {
+      throw new CsvUpdaterException(e);
+    }
+  }
+
+  private void mergeInputAndOutputPath_WithoutManageExceptions() throws IOException {
+
+    Files.delete(csvReaderParameters.getPath());
+    Path outputPath = Paths.get(
+        csvWriterParameters.getOutputFolderPath() + FileSystems.getDefault().getSeparator()
+            + csvWriterParameters.getOutputFilename());
+    Files.move(outputPath, csvReaderParameters.getPath());
+
+  }
+
+  private void addCsvRecordHeaderValues_WithoutInputAndOutputMerge(
       PivotedCsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
 
     try (CsvWriter csvWriter = csvWriterFactory.create(
