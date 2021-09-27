@@ -168,7 +168,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
     readAndWriteAndMerge(new DeleteColumnConsumer(headers));
   }
 
-  private class DeleteColumnConsumer extends CopyConsumer {
+  private class DeleteColumnConsumer extends CsvRecordHeaderValuesCopyConsumer {
 
     private Set<String> columnsToBeDeleted;
     private CsvWriter csvWriter;
@@ -207,20 +207,6 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   }
 
-  protected class CopyConsumer implements CsvRecordHeaderValuesConsumer {
-
-    @Override
-    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
-        throws CsvUpdaterException {
-      try {
-        csvWriter.writeCsvRecord(csvRecordHeaderValues);
-      } catch (CsvWriterException e) {
-        throw new CsvUpdaterException(e);
-      }
-    }
-
-  }
-
   /**
    * Rename columns of csv.
    *
@@ -232,7 +218,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
     readAndWriteAndMerge(new RenameConsumer(oldHeaderToNewHeaderMap));
   }
 
-  private class RenameConsumer extends CopyConsumer {
+  private class RenameConsumer extends CsvRecordHeaderValuesCopyConsumer {
 
     private Map<String, String> oldHeaderToNewHeaderMap;
     private CsvWriter csvWriter;
