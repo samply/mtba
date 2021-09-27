@@ -123,6 +123,15 @@ public class CsvWriter implements Closeable {
     return (String[]) headersInOrder.toArray();
   }
 
+  /**
+   * Get Csv Record Header Order.
+   *
+   * @return csv record header order.
+   */
+  public CsvRecordHeaderOrder getCsvRecordHeaderOrder() {
+    return csvRecordHeaderOrder;
+  }
+
   @Override
   public void close() throws IOException {
     if (csvPrinter != null) {

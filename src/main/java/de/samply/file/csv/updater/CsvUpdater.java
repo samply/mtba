@@ -1,5 +1,6 @@
 package de.samply.file.csv.updater;
 
+import de.samply.file.csv.CsvRecordHeaderOrder;
 import de.samply.file.csv.CsvRecordHeaderValues;
 import de.samply.file.csv.reader.CsvReader;
 import de.samply.file.csv.reader.CsvReaderException;
@@ -15,7 +16,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,15 +48,23 @@ public class CsvUpdater {
   /**
    * Add csv record header values to file.
    *
-   * @param csvRecordHeaderValues csv record header values.
+   * @param pivotedCsvRecordHeaderValues csv record header values.
    * @throws CsvUpdaterException exception that encapsulates internal exceptions.
    */
   public void addPivotedCsvRecordHeaderValues(
-      PivotedCsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
+      PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvUpdaterException {
 
-    addCsvRecordHeaderValues_WithoutInputAndOutputMerge(csvRecordHeaderValues);
-    mergeInputAndOutputPath();
+    readAndWriteAndMerge((csvWriter,
+        csvRecordHeaderValues) -> addCsvRecordHeaderValues(csvWriter, csvRecordHeaderValues,
+        pivotedCsvRecordHeaderValues));
 
+  }
+
+
+  private interface CsvRecordHeaderValuesConsumer {
+
+    void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+        throws CsvUpdaterException;
   }
 
   /**
@@ -60,6 +72,51 @@ public class CsvUpdater {
    * output as input.
    * <p>TODO: Do not delete input file: Rename it and send it to SUCCESSFUL or ERROR folder.</p>
    */
+  private void readAndWriteAndMerge(CsvRecordHeaderValuesConsumer consumer)
+      throws CsvUpdaterException {
+    readAndWrite(consumer);
+    mergeInputAndOutputPath();
+  }
+
+  private void readAndWrite(CsvRecordHeaderValuesConsumer consumer)
+      throws CsvUpdaterException {
+
+    try (CsvReader csvReader = new CsvReader(csvReaderParameters)) {
+      readAndWrite(csvReader, consumer);
+    } catch (CsvReaderException | IOException e) {
+      throw new CsvUpdaterException(e);
+    }
+
+  }
+
+  private void readAndWrite(CsvReader csvReader, CsvRecordHeaderValuesConsumer consumer)
+      throws CsvUpdaterException {
+
+    try (CsvWriter csvWriter = csvWriterFactory.create(
+        csvWriterParameters.getCsvRecordHeaderOrder(),
+        csvWriterParameters.getOutputFilename())) {
+      readAndWrite(csvReader, csvWriter, consumer);
+    } catch (CsvWriterFactoryException | IOException | CsvReaderException e) {
+      throw new CsvUpdaterException(e);
+    }
+
+  }
+
+  private void readAndWrite(CsvReader csvReader, CsvWriter csvWriter,
+      CsvRecordHeaderValuesConsumer consumer)
+      throws CsvUpdaterException, CsvReaderException {
+
+    csvReader
+        .fetchCsvRecordHeaderValues()
+        .map(EitherUtils.liftConsumer(
+            csvRecordHeaderValues -> consumer.accept(csvWriter, csvRecordHeaderValues)))
+        .filter(Objects::nonNull)
+        .forEach(either -> logger
+            .error("Exception while applying consumer to file", (Exception) either.getLeft()));
+
+  }
+
+
   private void mergeInputAndOutputPath() throws CsvUpdaterException {
     try {
       mergeInputAndOutputPath_WithoutManageExceptions();
@@ -78,44 +135,19 @@ public class CsvUpdater {
 
   }
 
-  private void addCsvRecordHeaderValues_WithoutInputAndOutputMerge(
-      PivotedCsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
-
-    try (CsvWriter csvWriter = csvWriterFactory.create(
-        csvWriterParameters.getCsvRecordHeaderOrder(),
-        csvWriterParameters.getOutputFilename())) {
-      addCsvRecordHeaderValues(csvWriter, csvRecordHeaderValues);
-    } catch (CsvWriterFactoryException | IOException e) {
-      throw new CsvUpdaterException(e);
-    }
-  }
-
   private void addCsvRecordHeaderValues(CsvWriter csvWriter,
-      PivotedCsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
-
-    try (CsvReader csvReader = new CsvReader(csvReaderParameters)) {
-      addCsvRecordHeaderValues(csvWriter, csvReader, csvRecordHeaderValues);
-    } catch (CsvReaderException | IOException e) {
+      CsvRecordHeaderValues csvRecordHeaderValues,
+      PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvUpdaterException {
+    try {
+      addCsvRecordHeaderValues_WithoutManagementException(csvWriter, csvRecordHeaderValues,
+          pivotedCsvRecordHeaderValues);
+    } catch (CsvWriterException e) {
       throw new CsvUpdaterException(e);
     }
 
   }
 
-  private void addCsvRecordHeaderValues(CsvWriter csvWriter, CsvReader csvReader,
-      PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvReaderException {
-
-    csvReader
-        .fetchCsvRecordHeaderValues()
-        .map(EitherUtils.liftConsumer(
-            csvRecordHeaderValues -> addCsvRecordHeaderValues(csvWriter, csvRecordHeaderValues,
-                pivotedCsvRecordHeaderValues)))
-        .filter(Objects::nonNull)
-        .forEach(either -> logger
-            .error("Exception while applying consumer to file", (Exception) either.getLeft()));
-
-  }
-
-  private void addCsvRecordHeaderValues(CsvWriter csvWriter,
+  private void addCsvRecordHeaderValues_WithoutManagementException(CsvWriter csvWriter,
       CsvRecordHeaderValues csvRecordHeaderValues,
       PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvWriterException {
 
@@ -130,5 +162,128 @@ public class CsvUpdater {
 
   }
 
+  /**
+   * Delete columns of csv.
+   *
+   * @param headers headers to be deleted.
+   */
+  public void deleteColumns(Set<String> headers) throws CsvUpdaterException {
+    readAndWriteAndMerge(new DeleteColumnConsumer(headers));
+  }
+
+  private class DeleteColumnConsumer extends CopyConsumer {
+
+    private Set<String> columnsToBeDeleted;
+    private CsvWriter csvWriter;
+
+    public DeleteColumnConsumer(Set<String> columnsToBeDeleted) {
+      this.columnsToBeDeleted = columnsToBeDeleted;
+    }
+
+    @Override
+    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+        throws CsvUpdaterException {
+
+      filterColumnsInCsvWriter(csvWriter);
+      filterHeadersInCsvRecordHeaderValues(csvRecordHeaderValues);
+
+      super.accept(csvWriter, csvRecordHeaderValues);
+
+    }
+
+    private void filterColumnsInCsvWriter(CsvWriter csvWriter) {
+
+      if (this.csvWriter == null) {
+
+        CsvRecordHeaderOrder csvRecordHeaderOrder = csvWriter.getCsvRecordHeaderOrder();
+        csvRecordHeaderOrder.removeHeaders(columnsToBeDeleted);
+
+        this.csvWriter = csvWriter;
+
+      }
+    }
+
+    private void filterHeadersInCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues) {
+      Map<String, String> headerValueMap = csvRecordHeaderValues.getHeaderValueMap();
+      columnsToBeDeleted.stream().forEach(header -> headerValueMap.remove(header));
+    }
+
+  }
+
+  private class CopyConsumer implements CsvRecordHeaderValuesConsumer {
+
+    @Override
+    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+        throws CsvUpdaterException {
+      try {
+        csvWriter.addCsvRecord(csvRecordHeaderValues);
+      } catch (CsvWriterException e) {
+        throw new CsvUpdaterException(e);
+      }
+    }
+
+  }
+
+  /**
+   * Rename columns of csv.
+   *
+   * @param oldHeaderToNewHeaderMap map old header - new header.
+   */
+  public void renameColumns(Map<String, String> oldHeaderToNewHeaderMap)
+      throws CsvUpdaterException {
+    readAndWriteAndMerge(new RenameConsumer(oldHeaderToNewHeaderMap));
+  }
+
+  private class RenameConsumer extends CopyConsumer {
+
+    private Map<String, String> oldHeaderToNewHeaderMap;
+    private CsvWriter csvWriter;
+
+    public RenameConsumer(Map<String, String> oldHeaderToNewHeaderMap) {
+      this.oldHeaderToNewHeaderMap = oldHeaderToNewHeaderMap;
+    }
+
+    @Override
+    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+        throws CsvUpdaterException {
+
+      renameCsvWriterColumns(csvWriter);
+      renameCsvRecordHeaderValues(csvRecordHeaderValues);
+
+      super.accept(csvWriter, csvRecordHeaderValues);
+
+    }
+
+    private void renameCsvWriterColumns(CsvWriter csvWriter) {
+
+      if (this.csvWriter == null) {
+
+        this.csvWriter = csvWriter;
+        CsvRecordHeaderOrder csvRecordHeaderOrder = csvWriter.getCsvRecordHeaderOrder();
+        csvRecordHeaderOrder.renameHeaders(oldHeaderToNewHeaderMap);
+
+      }
+    }
+
+    private void renameCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues) {
+
+      Map<String, String> headerValueMap = csvRecordHeaderValues.getHeaderValueMap();
+      for (Entry<String, String> entry : oldHeaderToNewHeaderMap.entrySet()) {
+
+        String oldHeader = entry.getKey();
+        String newHeader = entry.getValue();
+
+        String value = headerValueMap.get(oldHeader);
+        if (value != null) {
+          headerValueMap.remove(oldHeader);
+          headerValueMap.put(newHeader, value);
+        }
+
+      }
+
+    }
+
+
+  }
 
 }

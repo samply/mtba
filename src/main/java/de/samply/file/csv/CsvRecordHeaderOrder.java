@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class CsvRecordHeaderOrder {
 
@@ -99,4 +101,47 @@ public class CsvRecordHeaderOrder {
 
     return maxOrder;
   }
+
+  /**
+   * Remove headers.
+   *
+   * @param headers headers to be removed.
+   */
+  public void removeHeaders(Set<String> headers) {
+    if (headers != null && headers.size() > 0) {
+      headers.stream().forEach(header -> headerOrderMap.remove(header));
+      headersInOrder = fetchHeadersInOrder();
+    }
+  }
+
+  /**
+   * Rename headers.
+   *
+   * @param oldHeaderToNewHeaderMap map old header - new header.
+   */
+  public void renameHeaders(Map<String, String> oldHeaderToNewHeaderMap) {
+
+    boolean isChanged = false;
+
+    for (Entry<String, String> entry : oldHeaderToNewHeaderMap.entrySet()) {
+
+      String oldHeader = entry.getKey();
+      String newHeader = entry.getValue();
+      Integer order = headerOrderMap.get(oldHeader);
+      if (order != null) {
+
+        headerOrderMap.remove(oldHeader);
+        headerOrderMap.put(newHeader, order);
+        isChanged = true;
+
+      }
+
+    }
+
+    if (isChanged) {
+      headersInOrder = fetchHeadersInOrder();
+    }
+
+  }
+
 }
