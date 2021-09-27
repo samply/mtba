@@ -6,6 +6,6 @@ import java.util.stream.Stream;
 
 public interface CsvReader extends Closeable {
 
-  Stream<CsvRecordHeaderValues> fetchCsvRecordHeaderValues() throws CsvReaderException;
+  Stream<CsvRecordHeaderValues> readCsvRecordHeaderValues() throws CsvReaderException;
 
 }

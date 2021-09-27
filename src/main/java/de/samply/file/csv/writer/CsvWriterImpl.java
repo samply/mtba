@@ -53,7 +53,7 @@ public class CsvWriterImpl implements CsvWriter {
    * @throws CsvWriterException exception that encapsulates internal exceptions.
    */
   @Override
-  public void addCsvRecord(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvWriterException {
+  public void writeCsvRecord(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvWriterException {
     try {
       addCsvRecord_WithoutManagementException(csvRecordHeaderValues);
     } catch (IOException e) {

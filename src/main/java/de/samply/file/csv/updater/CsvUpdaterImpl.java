@@ -108,7 +108,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
       throws CsvUpdaterException, CsvReaderException {
 
     csvReader
-        .fetchCsvRecordHeaderValues()
+        .readCsvRecordHeaderValues()
         .map(EitherUtils.liftConsumer(
             csvRecordHeaderValues -> consumer.accept(csvWriter, csvRecordHeaderValues)))
         .filter(Objects::nonNull)
@@ -158,7 +158,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
         pivotedCsvRecordHeaderValues.getCsvRecordHeaderValues(pivotValue);
     csvRecordHeaderValues.merge(newCsvRecordHeaderValues);
 
-    csvWriter.addCsvRecord(csvRecordHeaderValues);
+    csvWriter.writeCsvRecord(csvRecordHeaderValues);
 
 
   }
@@ -218,7 +218,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
     public void accept(CsvWriterImpl csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
         throws CsvUpdaterException {
       try {
-        csvWriter.addCsvRecord(csvRecordHeaderValues);
+        csvWriter.writeCsvRecord(csvRecordHeaderValues);
       } catch (CsvWriterException e) {
         throw new CsvUpdaterException(e);
       }

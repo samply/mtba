@@ -6,7 +6,7 @@ import java.io.Closeable;
 
 public interface CsvWriter extends Closeable {
 
-  void addCsvRecord(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvWriterException;
+  void writeCsvRecord(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvWriterException;
 
   CsvRecordHeaderOrder getCsvRecordHeaderOrder();
 

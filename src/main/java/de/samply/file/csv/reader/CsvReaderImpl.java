@@ -32,7 +32,7 @@ public class CsvReaderImpl implements CsvReader {
    * @throws CsvReaderException exception that encapsulates all exceptions within the class.
    */
   @Override
-  public Stream<CsvRecordHeaderValues> fetchCsvRecordHeaderValues() throws CsvReaderException {
+  public Stream<CsvRecordHeaderValues> readCsvRecordHeaderValues() throws CsvReaderException {
 
     return (csvReaderParameters != null && csvReaderParameters.getPath() != null)
         ? fetchCsvRecordHeaderValues_WithoutCheck()
