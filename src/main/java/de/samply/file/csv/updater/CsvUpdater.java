@@ -12,4 +12,6 @@ public interface CsvUpdater {
 
   void renameColumns(Map<String, String> oldHeaderToNewHeaderMap) throws CsvUpdaterException;
 
+  void applyConsumer(CsvRecordHeaderValuesConsumer consumer) throws CsvUpdaterException;
+
 }

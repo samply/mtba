@@ -11,7 +11,6 @@ import de.samply.file.csv.writer.CsvWriterException;
 import de.samply.file.csv.writer.CsvWriterFactory;
 import de.samply.file.csv.writer.CsvWriterFactoryException;
 import de.samply.file.csv.writer.CsvWriterFactoryImpl;
-import de.samply.file.csv.writer.CsvWriterImpl;
 import de.samply.file.csv.writer.CsvWriterParameters;
 import de.samply.utils.EitherUtils;
 import java.io.IOException;
@@ -62,13 +61,6 @@ public class CsvUpdaterImpl implements CsvUpdater {
         csvRecordHeaderValues) -> addCsvRecordHeaderValues(csvWriter, csvRecordHeaderValues,
         pivotedCsvRecordHeaderValues));
 
-  }
-
-
-  private interface CsvRecordHeaderValuesConsumer {
-
-    void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
-        throws CsvUpdaterException;
   }
 
   /**
@@ -215,7 +207,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   }
 
-  private class CopyConsumer implements CsvRecordHeaderValuesConsumer {
+  protected class CopyConsumer implements CsvRecordHeaderValuesConsumer {
 
     @Override
     public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
@@ -291,5 +283,15 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   }
 
+  /**
+   * Apply consumer to each csv record header values.
+   *
+   * @param consumer csv record header values consumer.
+   * @throws CsvUpdaterException excetion that encapsulates internal exceptions.
+   */
+  @Override
+  public void applyConsumer(CsvRecordHeaderValuesConsumer consumer) throws CsvUpdaterException {
+    readAndWriteAndMerge(consumer);
+  }
 
 }
