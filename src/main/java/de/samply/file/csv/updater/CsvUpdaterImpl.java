@@ -2,12 +2,15 @@ package de.samply.file.csv.updater;
 
 import de.samply.file.csv.CsvRecordHeaderOrder;
 import de.samply.file.csv.CsvRecordHeaderValues;
+import de.samply.file.csv.reader.CsvReader;
 import de.samply.file.csv.reader.CsvReaderException;
 import de.samply.file.csv.reader.CsvReaderImpl;
 import de.samply.file.csv.reader.CsvReaderParameters;
+import de.samply.file.csv.writer.CsvWriter;
 import de.samply.file.csv.writer.CsvWriterException;
 import de.samply.file.csv.writer.CsvWriterFactory;
 import de.samply.file.csv.writer.CsvWriterFactoryException;
+import de.samply.file.csv.writer.CsvWriterFactoryImpl;
 import de.samply.file.csv.writer.CsvWriterImpl;
 import de.samply.file.csv.writer.CsvWriterParameters;
 import de.samply.utils.EitherUtils;
@@ -40,7 +43,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
   public CsvUpdaterImpl(CsvUpdaterParameters csvUpdaterParameters) throws CsvWriterException {
     this.csvReaderParameters = csvUpdaterParameters.getCsvReaderParameters();
     this.csvWriterParameters = csvUpdaterParameters.getCsvWriterParameters();
-    this.csvWriterFactory = new CsvWriterFactory(
+    this.csvWriterFactory = new CsvWriterFactoryImpl(
         csvWriterParameters.getOutputFolderPath(),
         csvWriterParameters.getMaxNumberOfRowsForFlush());
   }
@@ -64,7 +67,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   private interface CsvRecordHeaderValuesConsumer {
 
-    void accept(CsvWriterImpl csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+    void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
         throws CsvUpdaterException;
   }
 
@@ -82,7 +85,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
   private void readAndWrite(CsvRecordHeaderValuesConsumer consumer)
       throws CsvUpdaterException {
 
-    try (CsvReaderImpl csvReader = new CsvReaderImpl(csvReaderParameters)) {
+    try (CsvReader csvReader = new CsvReaderImpl(csvReaderParameters)) {
       readAndWrite(csvReader, consumer);
     } catch (CsvReaderException | IOException e) {
       throw new CsvUpdaterException(e);
@@ -90,10 +93,10 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   }
 
-  private void readAndWrite(CsvReaderImpl csvReader, CsvRecordHeaderValuesConsumer consumer)
+  private void readAndWrite(CsvReader csvReader, CsvRecordHeaderValuesConsumer consumer)
       throws CsvUpdaterException {
 
-    try (CsvWriterImpl csvWriter = csvWriterFactory.create(
+    try (CsvWriter csvWriter = csvWriterFactory.create(
         csvWriterParameters.getCsvRecordHeaderOrder(),
         csvWriterParameters.getOutputFilename())) {
       readAndWrite(csvReader, csvWriter, consumer);
@@ -103,7 +106,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   }
 
-  private void readAndWrite(CsvReaderImpl csvReader, CsvWriterImpl csvWriter,
+  private void readAndWrite(CsvReader csvReader, CsvWriter csvWriter,
       CsvRecordHeaderValuesConsumer consumer)
       throws CsvUpdaterException, CsvReaderException {
 
@@ -136,7 +139,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   }
 
-  private void addCsvRecordHeaderValues(CsvWriterImpl csvWriter,
+  private void addCsvRecordHeaderValues(CsvWriter csvWriter,
       CsvRecordHeaderValues csvRecordHeaderValues,
       PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvUpdaterException {
     try {
@@ -148,7 +151,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   }
 
-  private void addCsvRecordHeaderValues_WithoutManagementException(CsvWriterImpl csvWriter,
+  private void addCsvRecordHeaderValues_WithoutManagementException(CsvWriter csvWriter,
       CsvRecordHeaderValues csvRecordHeaderValues,
       PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvWriterException {
 
@@ -176,14 +179,14 @@ public class CsvUpdaterImpl implements CsvUpdater {
   private class DeleteColumnConsumer extends CopyConsumer {
 
     private Set<String> columnsToBeDeleted;
-    private CsvWriterImpl csvWriter;
+    private CsvWriter csvWriter;
 
     public DeleteColumnConsumer(Set<String> columnsToBeDeleted) {
       this.columnsToBeDeleted = columnsToBeDeleted;
     }
 
     @Override
-    public void accept(CsvWriterImpl csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
         throws CsvUpdaterException {
 
       filterColumnsInCsvWriter(csvWriter);
@@ -193,7 +196,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
     }
 
-    private void filterColumnsInCsvWriter(CsvWriterImpl csvWriter) {
+    private void filterColumnsInCsvWriter(CsvWriter csvWriter) {
 
       if (this.csvWriter == null) {
 
@@ -215,7 +218,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
   private class CopyConsumer implements CsvRecordHeaderValuesConsumer {
 
     @Override
-    public void accept(CsvWriterImpl csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
         throws CsvUpdaterException {
       try {
         csvWriter.writeCsvRecord(csvRecordHeaderValues);
@@ -240,14 +243,14 @@ public class CsvUpdaterImpl implements CsvUpdater {
   private class RenameConsumer extends CopyConsumer {
 
     private Map<String, String> oldHeaderToNewHeaderMap;
-    private CsvWriterImpl csvWriter;
+    private CsvWriter csvWriter;
 
     public RenameConsumer(Map<String, String> oldHeaderToNewHeaderMap) {
       this.oldHeaderToNewHeaderMap = oldHeaderToNewHeaderMap;
     }
 
     @Override
-    public void accept(CsvWriterImpl csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
         throws CsvUpdaterException {
 
       renameCsvWriterColumns(csvWriter);
@@ -257,7 +260,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
     }
 
-    private void renameCsvWriterColumns(CsvWriterImpl csvWriter) {
+    private void renameCsvWriterColumns(CsvWriter csvWriter) {
 
       if (this.csvWriter == null) {
 

@@ -3,7 +3,6 @@ package de.samply.file.csv.writer;
 import de.samply.file.csv.CsvRecordHeaderOrder;
 import de.samply.file.csv.CsvRecordHeaderValues;
 import java.io.BufferedWriter;
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -53,7 +52,8 @@ public class CsvWriterImpl implements CsvWriter {
    * @throws CsvWriterException exception that encapsulates internal exceptions.
    */
   @Override
-  public void writeCsvRecord(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvWriterException {
+  public void writeCsvRecord(CsvRecordHeaderValues csvRecordHeaderValues)
+      throws CsvWriterException {
     try {
       addCsvRecord_WithoutManagementException(csvRecordHeaderValues);
     } catch (IOException e) {
