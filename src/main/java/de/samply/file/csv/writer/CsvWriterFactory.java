@@ -36,7 +36,7 @@ public class CsvWriterFactory {
    * @return csv writer.
    * @throws CsvWriterFactoryException exception that catches internal exceptions.
    */
-  public CsvWriter create(CsvRecordHeaderOrder csvRecordHeaderOrder, String outputFilename)
+  public CsvWriterImpl create(CsvRecordHeaderOrder csvRecordHeaderOrder, String outputFilename)
       throws CsvWriterFactoryException {
     try {
       return create_WithoutManagementException(csvRecordHeaderOrder, outputFilename);
@@ -46,13 +46,13 @@ public class CsvWriterFactory {
   }
 
 
-  private CsvWriter create_WithoutManagementException(CsvRecordHeaderOrder csvRecordHeaderOrder,
+  private CsvWriterImpl create_WithoutManagementException(CsvRecordHeaderOrder csvRecordHeaderOrder,
       String outputFilename)
       throws CsvWriterException {
 
     CsvWriterParameters csvWriterParameters = generateCsvWriterParameters(csvRecordHeaderOrder,
         outputFilename);
-    return new CsvWriter(csvWriterParameters);
+    return new CsvWriterImpl(csvWriterParameters);
 
   }
 

@@ -14,3 +14,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - CSV Updater
 - CSV Updater: Rename columns
 - CSV Updater: Delete columns
+- Interfaces for csv reader, writer and updater

@@ -28,7 +28,7 @@ public class CsvUpdaterFactory {
    * @param inputPath input path.
    * @return csv updater.
    */
-  public CsvUpdater createCsvUpdater(Path inputPath) throws CsvUpdaterFactoryException {
+  public CsvUpdaterImpl createCsvUpdater(Path inputPath) throws CsvUpdaterFactoryException {
 
     CsvReaderParameters csvReaderParameters = createCsvReaderParameters(inputPath);
     CsvWriterParameters csvWriterParameters = createCsvWriterParameters(inputPath);
@@ -37,7 +37,7 @@ public class CsvUpdaterFactory {
 
   }
 
-  private CsvUpdater createCsvUpdater(CsvReaderParameters csvReaderParameters,
+  private CsvUpdaterImpl createCsvUpdater(CsvReaderParameters csvReaderParameters,
       CsvWriterParameters csvWriterParameters) throws CsvUpdaterFactoryException {
     try {
       return createCsvUpdater_WithoutManagementException(csvReaderParameters, csvWriterParameters);
@@ -46,7 +46,7 @@ public class CsvUpdaterFactory {
     }
   }
 
-  private CsvUpdater createCsvUpdater_WithoutManagementException(
+  private CsvUpdaterImpl createCsvUpdater_WithoutManagementException(
       CsvReaderParameters csvReaderParameters,
       CsvWriterParameters csvWriterParameters) throws CsvWriterException {
 
@@ -54,7 +54,7 @@ public class CsvUpdaterFactory {
     csvUpdaterParameters.setCsvReaderParameters(csvReaderParameters);
     csvUpdaterParameters.setCsvWriterParameters(csvWriterParameters);
 
-    return new CsvUpdater(csvUpdaterParameters);
+    return new CsvUpdaterImpl(csvUpdaterParameters);
 
   }
 
