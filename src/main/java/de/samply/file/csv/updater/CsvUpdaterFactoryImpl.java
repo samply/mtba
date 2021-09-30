@@ -23,16 +23,17 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
   }
 
   /**
-   * Create csv updater from input path.
+   * Create csv reader updater for csv reader parameters.
    *
-   * @param inputPath input path.
+   * @param csvReaderParameters csv reader parameters.
    * @return csv updater.
+   * @throws CsvUpdaterFactoryException exception that encapsulates internal exceptions.
    */
   @Override
-  public CsvUpdater createCsvUpdater(Path inputPath) throws CsvUpdaterFactoryException {
+  public CsvUpdater createCsvUpdater(CsvReaderParameters csvReaderParameters)
+      throws CsvUpdaterFactoryException {
 
-    CsvReaderParameters csvReaderParameters = createCsvReaderParameters(inputPath);
-    CsvWriterParameters csvWriterParameters = createCsvWriterParameters(inputPath);
+    CsvWriterParameters csvWriterParameters = createCsvWriterParameters(csvReaderParameters);
 
     return createCsvUpdater(csvReaderParameters, csvWriterParameters);
 
@@ -59,40 +60,17 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
 
   }
 
-  private CsvReaderParameters createCsvReaderParameters(Path inputPath) {
-
-    CsvReaderParameters csvReaderParameters = new CsvReaderParameters();
-
-    String inputFilename = getInputFilename(inputPath);
-    PathsBundle pathsBundle = createpPathsBundle(inputPath);
-
-    csvReaderParameters.setFilename(inputFilename);
-    csvReaderParameters.setPathsBundle(pathsBundle);
-
-    return csvReaderParameters;
-
-  }
-
-  private PathsBundle createpPathsBundle(Path inputPath) {
-
-    PathsBundle pathsBundle = new PathsBundle();
-    pathsBundle.addPath(inputPath);
-
-    return pathsBundle;
-
-  }
-
-
-  private CsvWriterParameters createCsvWriterParameters(Path inputPath)
+  private CsvWriterParameters createCsvWriterParameters(CsvReaderParameters csvReaderParameters)
       throws CsvUpdaterFactoryException {
 
     CsvWriterParameters csvWriterParameters = new CsvWriterParameters();
 
-    String outputFolderPath = extractOutputFolderPath(inputPath);
-    String outputFilename = extractOutputFilename(inputPath);
-    CsvRecordHeaderOrder csvRecordHeaderOrder = extractCsvRecordHeaderOrder(inputPath);
+    PathsBundle pathsBundle = csvReaderParameters.getPathsBundle();
+    String outputFilename = extractOutputFilename(csvReaderParameters);
+    CsvRecordHeaderOrder csvRecordHeaderOrder = extractCsvRecordHeaderOrder(
+        csvReaderParameters.getPath());
 
-    csvWriterParameters.setOutputFolderPath(outputFolderPath);
+    csvWriterParameters.setPathsBundle(pathsBundle);
     csvWriterParameters.setOutputFilename(outputFilename);
     csvWriterParameters.setMaxNumberOfRowsForFlush(maxNumberOfRowsPerFlush);
     csvWriterParameters.setCsvRecordHeaderOrder(csvRecordHeaderOrder);
@@ -101,16 +79,8 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
 
   }
 
-  private String extractOutputFolderPath(Path inputPath) {
-    return inputPath.getParent().toString();
-  }
-
-  private String extractOutputFilename(Path inputPath) {
-    return getInputFilename(inputPath) + CSV_UPDATE_FILENAME_EXTENSION;
-  }
-
-  private String getInputFilename(Path inputPath) {
-    return inputPath.getFileName().toString();
+  private String extractOutputFilename(CsvReaderParameters csvReaderParameters) {
+    return csvReaderParameters.getFilename() + CSV_UPDATE_FILENAME_EXTENSION;
   }
 
   private CsvRecordHeaderOrder extractCsvRecordHeaderOrder(Path inputPath)

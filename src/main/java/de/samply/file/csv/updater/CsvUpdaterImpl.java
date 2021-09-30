@@ -43,7 +43,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
     this.csvReaderParameters = csvUpdaterParameters.getCsvReaderParameters();
     this.csvWriterParameters = csvUpdaterParameters.getCsvWriterParameters();
     this.csvWriterFactory = new CsvWriterFactoryImpl(
-        csvWriterParameters.getOutputFolderPath(),
+        csvWriterParameters.getPathsBundle(),
         csvWriterParameters.getMaxNumberOfRowsForFlush());
   }
 
@@ -125,7 +125,8 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
     Files.delete(csvReaderParameters.getPath());
     Path outputPath = Paths.get(
-        csvWriterParameters.getOutputFolderPath() + FileSystems.getDefault().getSeparator()
+        csvWriterParameters.getPathsBundle().getDirectory() + FileSystems.getDefault()
+            .getSeparator()
             + csvWriterParameters.getOutputFilename());
     Files.move(outputPath, csvReaderParameters.getPath());
 

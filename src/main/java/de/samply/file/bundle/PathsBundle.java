@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 public class PathsBundle {
 
 
+  private Path directory;
   private final Logger logger = LoggerFactory.getLogger(PathsBundle.class);
   private final Map<String, Path> pathMap = new HashMap<>();
 
@@ -26,10 +27,26 @@ public class PathsBundle {
 
     if (path != null && Files.exists(path)) {
       pathMap.put(path.getFileName().toString(), path);
+      setDirectory(path);
     }
 
   }
 
+
+  private void setDirectory(Path path) {
+    if (directory == null && path != null) {
+      directory = path.getParent();
+    }
+  }
+
+  /**
+   * Get Directory of Paths Bundle.
+   *
+   * @return directory of paths bundle.
+   */
+  public Path getDirectory() {
+    return directory;
+  }
 
   /**
    * Get all paths of bundle.

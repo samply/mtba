@@ -1,9 +1,10 @@
 package de.samply.file.csv.updater;
 
-import java.nio.file.Path;
+import de.samply.file.csv.reader.CsvReaderParameters;
 
 public interface CsvUpdaterFactory {
 
-  CsvUpdater createCsvUpdater(Path inputPath) throws CsvUpdaterFactoryException;
+  CsvUpdater createCsvUpdater(CsvReaderParameters csvReaderParameters)
+      throws CsvUpdaterFactoryException;
 
 }

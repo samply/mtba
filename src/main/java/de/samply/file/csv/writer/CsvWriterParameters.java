@@ -1,11 +1,12 @@
 package de.samply.file.csv.writer;
 
+import de.samply.file.bundle.PathsBundle;
 import de.samply.file.csv.CsvRecordHeaderOrder;
 
 public class CsvWriterParameters {
 
   private CsvRecordHeaderOrder csvRecordHeaderOrder;
-  private String outputFolderPath;
+  private PathsBundle pathsBundle;
   private String outputFilename;
   private Integer maxNumberOfRowsForFlush;
 
@@ -25,12 +26,12 @@ public class CsvWriterParameters {
     this.csvRecordHeaderOrder = csvRecordHeaderOrder;
   }
 
-  public String getOutputFolderPath() {
-    return outputFolderPath;
+  public PathsBundle getPathsBundle() {
+    return pathsBundle;
   }
 
-  public void setOutputFolderPath(String outputFolderPath) {
-    this.outputFolderPath = outputFolderPath;
+  public void setPathsBundle(PathsBundle pathsBundle) {
+    this.pathsBundle = pathsBundle;
   }
 
   public String getOutputFilename() {

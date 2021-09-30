@@ -1,29 +1,30 @@
 package de.samply.file.csv.writer;
 
+import de.samply.file.bundle.PathsBundle;
 import de.samply.file.csv.CsvRecordHeaderOrder;
 
 public class CsvWriterFactoryImpl implements CsvWriterFactory {
 
-  private String outputFolderPath;
+  private PathsBundle pathsBundle;
   private Integer maxNumberOfRowsPerFlush = 100;
 
   /**
    * Generates csv writers.
    *
-   * @param outputFolderPath output folder path.
+   * @param pathsBundle paths bundle
    */
-  public CsvWriterFactoryImpl(String outputFolderPath) {
-    this.outputFolderPath = outputFolderPath;
+  public CsvWriterFactoryImpl(PathsBundle pathsBundle) {
+    this.pathsBundle = pathsBundle;
   }
 
   /**
    * Generates csv writers.
    *
-   * @param outputFolderPath        output folder path.
+   * @param pathsBundle             paths bundle.
    * @param maxNumberOfRowsPerFlush maximal number of rows to be written per flush.
    */
-  public CsvWriterFactoryImpl(String outputFolderPath, Integer maxNumberOfRowsPerFlush) {
-    this.outputFolderPath = outputFolderPath;
+  public CsvWriterFactoryImpl(PathsBundle pathsBundle, Integer maxNumberOfRowsPerFlush) {
+    this(pathsBundle);
     this.maxNumberOfRowsPerFlush = maxNumberOfRowsPerFlush;
   }
 
@@ -64,7 +65,7 @@ public class CsvWriterFactoryImpl implements CsvWriterFactory {
 
     csvWriterParameters.setCsvRecordHeaderOrder(csvRecordHeaderOrder);
     csvWriterParameters.setOutputFilename(outputFilename);
-    csvWriterParameters.setOutputFolderPath(outputFolderPath);
+    csvWriterParameters.setPathsBundle(pathsBundle);
 
     return csvWriterParameters;
 

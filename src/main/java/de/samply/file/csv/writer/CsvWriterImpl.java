@@ -31,13 +31,14 @@ public class CsvWriterImpl implements CsvWriter {
 
     this.csvRecordHeaderOrder = csvWriterParameters.getCsvRecordHeaderOrder();
     this.outputPath = generateOutputPath(csvWriterParameters);
+    csvWriterParameters.getPathsBundle().addPath(outputPath);
     this.csvPrinter = createCsvPrinter(csvRecordHeaderOrder, outputPath);
 
   }
 
   private Path generateOutputPath(CsvWriterParameters csvWriterParameters) {
 
-    String file = csvWriterParameters.getOutputFolderPath()
+    String file = csvWriterParameters.getPathsBundle().getDirectory()
         + FileSystems.getDefault().getSeparator()
         + csvWriterParameters.getOutputFilename();
 
