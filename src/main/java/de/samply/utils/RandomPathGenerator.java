@@ -17,6 +17,7 @@ public class RandomPathGenerator {
 
   /**
    * Create random csv files.
+   *
    * @param filesNumber number of files to be created.
    * @return List of files.
    * @throws IOException IO Exception.
@@ -25,8 +26,7 @@ public class RandomPathGenerator {
 
     List<Path> pathList = new ArrayList<>();
 
-    Path testDirectory = Files.createTempDirectory(Paths.get(DEFAULT_DIRECTORY),
-        TEMP_DIRECTORY_PREFIX);
+    Path testDirectory = createRandomDirectory();
 
     for (int i = 0; i < filesNumber; i++) {
       Path randomPath = createRandomPath(testDirectory, i + 1);
@@ -37,9 +37,20 @@ public class RandomPathGenerator {
   }
 
   /**
+   * Create random directory.
+   *
+   * @return Path of new random directory.
+   * @throws IOException IO Exception.
+   */
+  public static Path createRandomDirectory() throws IOException {
+    return Files.createTempDirectory(Paths.get(DEFAULT_DIRECTORY), TEMP_DIRECTORY_PREFIX);
+  }
+
+  /**
    * Creates random csv file.
+   *
    * @param directory Directory where the file is created.
-   * @param index Number to be added to file prefix.
+   * @param index     Number to be added to file prefix.
    * @return Random csv file.
    * @throws IOException IO Exception.
    */
