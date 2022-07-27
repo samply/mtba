@@ -1,6 +1,7 @@
 package de.samply.utils;
 
 import io.vavr.control.Either;
+import java.io.IOException;
 import java.util.function.Function;
 
 public class EitherUtils {
@@ -33,7 +34,7 @@ public class EitherUtils {
   @FunctionalInterface
   public interface ThrowingConsumer<T, E extends Exception> {
 
-    void accept(T t) throws E;
+    void accept(T t) throws E, IOException;
   }
 
   /**
