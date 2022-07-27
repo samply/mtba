@@ -13,12 +13,14 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVFormat.Builder;
 import org.apache.commons.csv.CSVRecord;
 
 public class CsvReaderImpl implements CsvReader {
 
-  private Reader reader;
-  private CsvReaderParameters csvReaderParameters;
+  private final Reader reader;
+  private final CsvReaderParameters csvReaderParameters;
+  private String delimiter = "\t";
 
   public CsvReaderImpl(CsvReaderParameters csvReaderParameters) throws CsvReaderException {
     this.csvReaderParameters = csvReaderParameters;
@@ -77,17 +79,16 @@ public class CsvReaderImpl implements CsvReader {
   private Iterable<CSVRecord> fetchCsvRecords_WithoutManagementException(Reader reader)
       throws IOException {
 
-    CSVFormat csvFormat = CSVFormat.DEFAULT;
+    Builder builder = Builder.create();
     if (!csvReaderParameters.readAllHeaders()) {
-      String[] headers = (String[]) csvReaderParameters.getHeaders().toArray();
-      csvFormat = csvFormat.withHeader(headers);
+      builder.setHeader(csvReaderParameters.getHeaders().toArray(new String[0]));
     }
 
-    return csvFormat
-        .withFirstRecordAsHeader()
-        .withIgnoreEmptyLines()
-        .withIgnoreHeaderCase()
-        .parse(reader);
+    return builder.setSkipHeaderRecord(true)
+        .setIgnoreEmptyLines(true)
+        .setIgnoreHeaderCase(true)
+        .setDelimiter(delimiter)
+        .build().parse(reader);
 
   }
 
@@ -102,6 +103,14 @@ public class CsvReaderImpl implements CsvReader {
 
   }
 
+  /**
+   * Set delimiter of csv file.
+   *
+   * @param delimiter Csv file delimiter.
+   */
+  public void setDelimiter(String delimiter) {
+    this.delimiter = delimiter;
+  }
 
   @Override
   public void close() throws IOException {

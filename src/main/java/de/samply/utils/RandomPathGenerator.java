@@ -86,7 +86,8 @@ public class RandomPathGenerator {
       StringBuilder stringBuilder = new StringBuilder();
       for (int j = 0; j < columnsNumber; j++) {
 
-        String randomWord = randomWords.get(random.nextInt(randomWords.size()));
+        String randomWord =
+            (i == 0) ? getHeader(j + 1) : randomWords.get(random.nextInt(randomWords.size()));
         stringBuilder.append(randomWord);
         stringBuilder.append('\t');
 
@@ -98,6 +99,16 @@ public class RandomPathGenerator {
 
     return randomContent;
 
+  }
+
+  /**
+   * Generate header.
+   *
+   * @param column Column index.
+   * @return Header title.
+   */
+  public static String getHeader(int column) {
+    return "HEADER-" + column;
   }
 
 }

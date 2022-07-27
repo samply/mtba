@@ -19,6 +19,17 @@ public class PathsBundle {
   private final Map<String, Path> pathMap = new HashMap<>();
 
   /**
+   * Add Paths to Paths Bundle.
+   *
+   * @param paths Paths to be added.
+   */
+  public void addPaths(Collection<Path> paths) {
+    for (Path path : paths) {
+      addPath(path);
+    }
+  }
+
+  /**
    * Add path to bundle.
    *
    * @param path path to be added.

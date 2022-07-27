@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -33,25 +34,12 @@ class PathsBundleTest {
   void setUp() throws IOException {
     List<Path> randomPaths = RandomPathGenerator.createRandomPaths(FILES_NUMBER);
     pathsBundle = new PathsBundle();
-    for (Path randomPath : randomPaths) {
-      pathsBundle.addPath(randomPath);
-    }
-
+    pathsBundle.addPaths(randomPaths);
   }
 
   @AfterAll
   void tearDown() throws IOException {
-
-    for (Path path : pathsBundle.getAllPaths()) {
-      try {
-        Files.delete(path);
-      } catch (IOException e) {
-        logger.error("Error deleting path " + path.getFileName(), e);
-      }
-    }
-    Path directory = pathsBundle.getDirectory();
-    Files.delete(directory);
-
+    FileUtils.deleteDirectory(pathsBundle.getDirectory().toFile());
   }
 
   @Test

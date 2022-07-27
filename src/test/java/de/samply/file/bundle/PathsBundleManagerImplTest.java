@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,16 +40,7 @@ class PathsBundleManagerImplTest {
   }
 
   private void deleteDirectory(Path directory) throws IOException {
-
-    Files.walk(directory).filter(Files::isRegularFile).forEach(path -> {
-      try {
-        Files.delete(path);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    });
-    Files.delete(directory);
-
+    FileUtils.deleteDirectory(directory.toFile());
   }
 
   @Test
