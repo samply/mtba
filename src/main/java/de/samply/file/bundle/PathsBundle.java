@@ -43,8 +43,11 @@ public class PathsBundle {
 
   }
 
-
-  private void setDirectory(Path path) {
+  /**
+   * Set directory of paths bundle.
+   * @param path Directory of paths bundle.
+   */
+  public void setDirectory(Path path) {
     if (directory == null && path != null) {
       directory = path.getParent();
     }

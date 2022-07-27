@@ -89,7 +89,7 @@ public class RandomPathGenerator {
         String randomWord =
             (i == 0) ? getHeader(j + 1) : randomWords.get(random.nextInt(randomWords.size()));
         stringBuilder.append(randomWord);
-        stringBuilder.append('\t');
+        stringBuilder.append(Constants.DEFAULT_DELIMITER);
 
       }
 

@@ -11,6 +11,14 @@ public class CsvReaderParameters {
   private String filename;
   private PathsBundle pathsBundle;
 
+  public CsvReaderParameters() {
+  }
+
+  public CsvReaderParameters(String filename, PathsBundle pathsBundle) {
+    this.filename = filename;
+    this.pathsBundle = pathsBundle;
+  }
+
   public Set<String> getHeaders() {
     return headers;
   }

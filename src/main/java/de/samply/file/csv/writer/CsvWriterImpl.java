@@ -95,7 +95,7 @@ public class CsvWriterImpl implements CsvWriter {
 
     }
 
-    return (String[]) values.toArray();
+    return values.toArray(new String[0]);
 
   }
 
@@ -122,7 +122,7 @@ public class CsvWriterImpl implements CsvWriter {
 
   private String[] getHeadersInOrder(CsvRecordHeaderOrder csvRecordHeaderOrder) {
     List<String> headersInOrder = csvRecordHeaderOrder.getHeadersInOrder();
-    return (String[]) headersInOrder.toArray();
+    return headersInOrder.toArray(new String[0]);
   }
 
   /**
