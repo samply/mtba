@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.samply.file.bundle.PathsBundle;
 import de.samply.file.csv.CsvRecordHeaderValues;
+import de.samply.utils.Constants;
 import de.samply.utils.RandomPathGenerator;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,7 +29,7 @@ class CsvReaderImplTest {
 
   @BeforeEach
   void setUp() throws IOException {
-    List<Path> randomPaths = RandomPathGenerator.createRandomPaths(FILES_NUMBER);
+    List<Path> randomPaths = RandomPathGenerator.createRandomCsvPaths(FILES_NUMBER);
     pathsBundle = new PathsBundle();
     pathsBundle.addPaths(randomPaths);
   }
@@ -74,7 +75,7 @@ class CsvReaderImplTest {
     HashSet<String> headers = new HashSet<>();
 
     boolean atLeastOneHeader = false;
-    for (String header : Files.readAllLines(path).get(0).split("\t")) {
+    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
       if (!atLeastOneHeader || Math.random() < 0.5) {
         headers.add(header);
         atLeastOneHeader = true;

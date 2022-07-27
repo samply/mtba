@@ -26,7 +26,7 @@ class PathsBundleManagerImplTest {
   @BeforeAll
   void setUp() throws IOException {
 
-    inputFolderPath = RandomPathGenerator.createRandomPaths(FILES_NUMBER).get(0).getParent();
+    inputFolderPath = RandomPathGenerator.createRandomCsvPaths(FILES_NUMBER).get(0).getParent();
     outputFolderPath = RandomPathGenerator.createRandomDirectory();
 
     pathsBundleManager = new PathsBundleManagerImpl(inputFolderPath, outputFolderPath);

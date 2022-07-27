@@ -22,7 +22,7 @@ public class RandomPathGenerator {
    * @return List of files.
    * @throws IOException IO Exception.
    */
-  public static List<Path> createRandomPaths(int filesNumber) throws IOException {
+  public static List<Path> createRandomCsvPaths(int filesNumber) throws IOException {
 
     List<Path> pathList = new ArrayList<>();
 
@@ -89,7 +89,9 @@ public class RandomPathGenerator {
         String randomWord =
             (i == 0) ? getHeader(j + 1) : randomWords.get(random.nextInt(randomWords.size()));
         stringBuilder.append(randomWord);
-        stringBuilder.append('\t');
+        if (j < columnsNumber - 1) {
+          stringBuilder.append(Constants.DEFAULT_DELIMITER);
+        }
 
       }
 
@@ -108,7 +110,7 @@ public class RandomPathGenerator {
    * @return Header title.
    */
   public static String getHeader(int column) {
-    return "HEADER-" + column;
+    return "HEAD-" + column;
   }
 
 }

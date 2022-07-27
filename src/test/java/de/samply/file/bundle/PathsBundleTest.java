@@ -3,6 +3,7 @@ package de.samply.file.bundle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.samply.utils.Constants;
 import de.samply.utils.EitherUtils.ThrowingConsumer;
 import de.samply.utils.RandomPathGenerator;
 import java.io.IOException;
@@ -32,7 +33,7 @@ class PathsBundleTest {
 
   @BeforeAll
   void setUp() throws IOException {
-    List<Path> randomPaths = RandomPathGenerator.createRandomPaths(FILES_NUMBER);
+    List<Path> randomPaths = RandomPathGenerator.createRandomCsvPaths(FILES_NUMBER);
     pathsBundle = new PathsBundle();
     pathsBundle.addPaths(randomPaths);
   }
@@ -63,7 +64,7 @@ class PathsBundleTest {
 
     for (Path path : pathsBundle.getAllPaths()) {
       for (String line : Files.readAllLines(path)) {
-        for (String element : line.split("\t")) {
+        for (String element : line.split(Constants.DEFAULT_DELIMITER)) {
           assertTrue(element.startsWith(LINE_ELEMENT_PREFIX));
         }
       }
@@ -87,10 +88,10 @@ class PathsBundleTest {
       List<String> newLines = new ArrayList<>();
       for (String line : Files.readAllLines(path)) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (String element : line.split("\t")) {
+        for (String element : line.split(Constants.DEFAULT_DELIMITER)) {
           stringBuilder.append(LINE_ELEMENT_PREFIX);
           stringBuilder.append(element);
-          stringBuilder.append('\t');
+          stringBuilder.append(Constants.DEFAULT_DELIMITER);
         }
         newLines.add(stringBuilder.toString());
       }

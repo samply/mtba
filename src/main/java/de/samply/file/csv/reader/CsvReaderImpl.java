@@ -2,6 +2,7 @@ package de.samply.file.csv.reader;
 
 import de.samply.file.csv.CsvRecordHeaderValues;
 import de.samply.file.csv.CsvRecordHeaderValuesIterator;
+import de.samply.utils.Constants;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -12,15 +13,15 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVFormat.Builder;
 import org.apache.commons.csv.CSVRecord;
 
 public class CsvReaderImpl implements CsvReader {
 
+
   private final Reader reader;
   private final CsvReaderParameters csvReaderParameters;
-  private String delimiter = "\t";
+  private String delimiter = Constants.DEFAULT_DELIMITER;
 
   public CsvReaderImpl(CsvReaderParameters csvReaderParameters) throws CsvReaderException {
     this.csvReaderParameters = csvReaderParameters;
@@ -82,6 +83,8 @@ public class CsvReaderImpl implements CsvReader {
     Builder builder = Builder.create();
     if (!csvReaderParameters.readAllHeaders()) {
       builder.setHeader(csvReaderParameters.getHeaders().toArray(new String[0]));
+    } else{
+      builder.setHeader();
     }
 
     return builder.setSkipHeaderRecord(true)

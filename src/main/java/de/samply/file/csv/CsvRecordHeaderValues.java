@@ -18,11 +18,15 @@ public class CsvRecordHeaderValues {
    */
   public CsvRecordHeaderValues(Set<String> headers, CSVRecord csvRecord) {
 
-    for (String header : headers) {
-      String value = csvRecord.get(header);
-      if (value != null) {
-        headerValueMap.put(header, value);
+    if (headers.size() > 0) {
+      for (String header : headers) {
+        String value = csvRecord.get(header);
+        if (value != null) {
+          headerValueMap.put(header, value);
+        }
       }
+    } else {
+      headerValueMap = csvRecord.toMap();
     }
 
   }

@@ -2,6 +2,7 @@ package de.samply.file.csv.writer;
 
 import de.samply.file.csv.CsvRecordHeaderOrder;
 import de.samply.file.csv.CsvRecordHeaderValues;
+import de.samply.utils.Constants;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVFormat.Builder;
 import org.apache.commons.csv.CSVPrinter;
 
 public class CsvWriterImpl implements CsvWriter {
@@ -20,6 +22,7 @@ public class CsvWriterImpl implements CsvWriter {
   private CSVPrinter csvPrinter;
   private int maxNumberOfRowsForFlush = 100;
   private int flushCounter = 0;
+  private String delimiter = Constants.DEFAULT_DELIMITER;
 
   /**
    * Writes csv records in csv file.
@@ -95,7 +98,7 @@ public class CsvWriterImpl implements CsvWriter {
 
     }
 
-    return (String[]) values.toArray();
+    return values.toArray(new String[0]);
 
   }
 
@@ -113,7 +116,15 @@ public class CsvWriterImpl implements CsvWriter {
       throws IOException {
 
     String[] headersInOrder = getHeadersInOrder(csvRecordHeaderOrder);
-    CSVFormat csvFormat = CSVFormat.DEFAULT.withHeader(headersInOrder);
+    Builder builder = Builder.create();
+    if (headersInOrder.length > 0) {
+      builder.setHeader(headersInOrder);
+    } else {
+      builder.setHeader();
+    }
+    CSVFormat csvFormat = builder
+        .setDelimiter(delimiter)
+        .build();
     BufferedWriter bufferedWriter = Files.newBufferedWriter(outputPath);
 
     return new CSVPrinter(bufferedWriter, csvFormat);
@@ -122,7 +133,7 @@ public class CsvWriterImpl implements CsvWriter {
 
   private String[] getHeadersInOrder(CsvRecordHeaderOrder csvRecordHeaderOrder) {
     List<String> headersInOrder = csvRecordHeaderOrder.getHeadersInOrder();
-    return (String[]) headersInOrder.toArray();
+    return headersInOrder.toArray(new String[0]);
   }
 
   /**
@@ -141,6 +152,15 @@ public class CsvWriterImpl implements CsvWriter {
       csvPrinter.flush();
       csvPrinter.close();
     }
+  }
+
+  /**
+   * Set CSV file delimiter.
+   *
+   * @param delimiter CSV file delimiter.
+   */
+  public void setDelimiter(String delimiter) {
+    this.delimiter = delimiter;
   }
 
 }
