@@ -18,6 +18,9 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
   private int maxNumberOfRowsPerFlush = 100;
 
 
+  public CsvUpdaterFactoryImpl() {
+  }
+
   public CsvUpdaterFactoryImpl(int maxNumberOfRowsPerFlush) {
     this.maxNumberOfRowsPerFlush = maxNumberOfRowsPerFlush;
   }

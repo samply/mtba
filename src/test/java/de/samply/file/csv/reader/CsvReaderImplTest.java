@@ -46,11 +46,13 @@ class CsvReaderImplTest {
 
     CsvReader csvReader = new CsvReaderImpl(csvReaderParameters);
     csvReader.readCsvRecordHeaderValues()
-        .forEach(csvRecordHeaderValues -> checkCsvRecordHeaderValues(csvRecordHeaderValues));
+        .forEach(this::checkCsvRecordHeaderValues);
 
   }
 
   private void checkCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues) {
+
+    // TODO: Alternative: Datei manuell lesen und in String[][] konvertieren. Test: Werte vergleichen.
     for (String header : headers) {
       assertNotNull(csvRecordHeaderValues.getValue(header));
     }
@@ -59,7 +61,6 @@ class CsvReaderImplTest {
   private CsvReaderParameters createCsvReaderParameters() throws IOException {
 
     CsvReaderParameters csvReaderParameters = new CsvReaderParameters();
-
     csvReaderParameters.setPathsBundle(pathsBundle);
     Path path = pathsBundle.getAllPaths().stream().collect(Collectors.toList()).get(0);
     headers = getRandomHeaders(path);
