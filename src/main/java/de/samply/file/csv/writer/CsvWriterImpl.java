@@ -146,6 +146,12 @@ public class CsvWriterImpl implements CsvWriter {
     return csvRecordHeaderOrder;
   }
 
+  public void setCsvRecordHeaderOrder (CsvRecordHeaderOrder csvRecordHeaderOrder)
+      throws CsvWriterException {
+    this.csvRecordHeaderOrder = csvRecordHeaderOrder;
+    this.csvPrinter = createCsvPrinter(csvRecordHeaderOrder, outputPath);
+  }
+
   @Override
   public void close() throws IOException {
     if (csvPrinter != null) {

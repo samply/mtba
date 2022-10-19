@@ -52,21 +52,30 @@ class CsvUpdaterImplTest {
   }
 
   @Test
-  void renameColumns() throws CsvUpdaterException, CsvReaderException {
+  void renameColumns() throws CsvUpdaterException, CsvReaderException, IOException {
 
     Map<String, String> oldHeadersNewHeadersMap = new HashMap<>();
-    csvReaderParameters.getHeaders().stream().forEach(
+    getRandomHeaders(csvReaderParameters.getPath()).stream().forEach(
         oldHeader -> oldHeadersNewHeadersMap.put(oldHeader, oldHeader + NEW_HEADER_SUFFIX));
     csvUpdater.renameColumns(oldHeadersNewHeadersMap);
 
     CsvReaderImpl csvReader = new CsvReaderImpl(csvReaderParameters);
-    csvReader.readCsvRecordHeaderValues().forEach(this::checkRename);
+    csvReader.readCsvRecordHeaderValues().forEach(
+        csvRecordHeaderValues -> checkRename(csvRecordHeaderValues, oldHeadersNewHeadersMap));
 
   }
 
-  private void checkRename(CsvRecordHeaderValues csvRecordHeaderValues) {
-    csvReaderParameters.getHeaders().forEach(
-        header -> assertNotNull(csvRecordHeaderValues.getValue(header + NEW_HEADER_SUFFIX)));
+  private void checkRename(CsvRecordHeaderValues csvRecordHeaderValues,
+      Map<String, String> oldHeadersNewHeadersMap) {
+    try {
+      getAllHeaders(csvReaderParameters.getPath()).forEach(
+          header -> {
+            String newHeader = oldHeadersNewHeadersMap.get(header);
+            assertNotNull(csvRecordHeaderValues.getValue((newHeader != null) ? newHeader : header));
+          });
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 
@@ -91,9 +100,9 @@ class CsvUpdaterImplTest {
     CsvReaderParameters csvReaderParameters = new CsvReaderParameters();
     csvReaderParameters.setPathsBundle(pathsBundle);
     Path path = pathsBundle.getAllPaths().stream().collect(Collectors.toList()).get(0);
-    headers = getRandomHeaders(path);
+    //headers = getRandomHeaders(path);
 
-    csvReaderParameters.setHeaders(headers);
+    //csvReaderParameters.setHeaders(headers);
     csvReaderParameters.setFilename(path.getFileName().toString());
 
     return csvReaderParameters;
@@ -113,6 +122,14 @@ class CsvUpdaterImplTest {
 
     return headers;
 
+  }
+
+  private Set<String> getAllHeaders(Path path) throws IOException {
+    HashSet<String> headers = new HashSet<>();
+    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
+      headers.add(header);
+    }
+    return headers;
   }
 
 

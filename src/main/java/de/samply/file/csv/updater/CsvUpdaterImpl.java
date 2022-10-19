@@ -100,7 +100,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   private void readAndWrite(CsvReader csvReader, CsvWriter csvWriter,
       CsvRecordHeaderValuesConsumer consumer)
-      throws CsvUpdaterException, CsvReaderException {
+      throws CsvReaderException {
 
     csvReader
         .readCsvRecordHeaderValues()
@@ -239,15 +239,25 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
     }
 
-    private void renameCsvWriterColumns(CsvWriter csvWriter) {
+    private void renameCsvWriterColumns(CsvWriter csvWriter) throws CsvUpdaterException {
+      try {
+        renameCsvWriterColumns_WithutManagementException(csvWriter);
+      } catch (CsvWriterException e) {
+        throw new CsvUpdaterException(e);
+      }
+    }
+
+    private void renameCsvWriterColumns_WithutManagementException(CsvWriter csvWriter)
+        throws CsvWriterException {
 
       if (this.csvWriter == null) {
-
         this.csvWriter = csvWriter;
         CsvRecordHeaderOrder csvRecordHeaderOrder = csvWriter.getCsvRecordHeaderOrder();
         csvRecordHeaderOrder.renameHeaders(oldHeaderToNewHeaderMap);
+        csvWriter.setCsvRecordHeaderOrder(csvRecordHeaderOrder);
 
       }
+
     }
 
     private void renameCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues) {
