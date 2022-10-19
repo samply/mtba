@@ -30,6 +30,9 @@ public class CsvReaderParameters {
   public void setHeaders(Set<String> headers) {
     this.headers = headers;
   }
+  public void clearHeaders() {
+    this.headers.clear();;
+  }
 
   public String getFilename() {
     return filename;

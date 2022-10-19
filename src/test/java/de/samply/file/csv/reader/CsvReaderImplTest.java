@@ -1,5 +1,6 @@
 package de.samply.file.csv.reader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.samply.file.bundle.PathsBundle;
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -25,7 +27,6 @@ class CsvReaderImplTest {
 
   private static final int FILES_NUMBER = 5;
   private PathsBundle pathsBundle;
-  private Set<String> headers;
 
   @BeforeEach
   void setUp() throws IOException {
@@ -41,21 +42,40 @@ class CsvReaderImplTest {
 
   @Test
   void readCsvRecordHeaderValues() throws CsvReaderException, IOException {
-
     CsvReaderParameters csvReaderParameters = createCsvReaderParameters();
+    readCsvRecordHeaderValues(csvReaderParameters, csvReaderParameters.getHeaders());
+  }
+
+  @Test
+  void readAllCsvRecordHeaderValues() throws CsvReaderException, IOException {
+    CsvReaderParameters csvReaderParameters = createCsvReaderParameters();
+    csvReaderParameters.clearHeaders();
+    Set<String> headersToRead = getAllHeaders(csvReaderParameters.getPath());
+    readCsvRecordHeaderValues(csvReaderParameters, headersToRead);
+  }
+
+  void readCsvRecordHeaderValues(CsvReaderParameters csvReaderParameters, Set<String> headersToRead)
+      throws IOException, CsvReaderException {
+
+    int numberOfLines = getNumberOfLines(csvReaderParameters.getPath());
 
     CsvReader csvReader = new CsvReaderImpl(csvReaderParameters);
-    csvReader.readCsvRecordHeaderValues()
-        .forEach(this::checkCsvRecordHeaderValues);
+    AtomicInteger counter = new AtomicInteger(0);
+    csvReader.readCsvRecordHeaderValues().forEach(csvRecordHeaderValues -> {
+      checkCsvRecordHeaderValues(csvRecordHeaderValues, headersToRead);
+      counter.incrementAndGet();
+    });
+    assertEquals(numberOfLines, counter.get());
 
   }
 
-  private void checkCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues) {
+  private void checkCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues, Set<String> headersToRead) {
 
     // TODO: Alternative: Datei manuell lesen und in String[][] konvertieren. Test: Werte vergleichen.
-    for (String header : headers) {
+    for (String header : headersToRead) {
       assertNotNull(csvRecordHeaderValues.getValue(header));
     }
+    assertEquals(headersToRead.size(), csvRecordHeaderValues.getHeaderValueMap().keySet().size());
   }
 
   private CsvReaderParameters createCsvReaderParameters() throws IOException {
@@ -63,9 +83,8 @@ class CsvReaderImplTest {
     CsvReaderParameters csvReaderParameters = new CsvReaderParameters();
     csvReaderParameters.setPathsBundle(pathsBundle);
     Path path = pathsBundle.getAllPaths().stream().collect(Collectors.toList()).get(0);
-    headers = getRandomHeaders(path);
 
-    csvReaderParameters.setHeaders(headers);
+    csvReaderParameters.setHeaders(getRandomHeaders(path));
     csvReaderParameters.setFilename(path.getFileName().toString());
 
     return csvReaderParameters;
@@ -85,6 +104,18 @@ class CsvReaderImplTest {
 
     return headers;
 
+  }
+
+  private Set<String> getAllHeaders(Path path) throws IOException {
+    HashSet<String> headers = new HashSet<>();
+    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
+        headers.add(header);
+    }
+    return headers;
+  }
+
+  private int getNumberOfLines(Path path) throws IOException {
+    return ((int) Files.readAllLines(path).stream().filter(line -> line.length() > 0).count()) - 1;
   }
 
 }
