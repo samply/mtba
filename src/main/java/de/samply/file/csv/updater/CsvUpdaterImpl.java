@@ -189,12 +189,22 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
     }
 
-    private void filterColumnsInCsvWriter(CsvWriter csvWriter) {
+    private void filterColumnsInCsvWriter(CsvWriter csvWriter) throws CsvUpdaterException {
+      try {
+        filterColumnsInCsvWriter_WithoutManagementException(csvWriter);
+      } catch (CsvWriterException e) {
+        throw new CsvUpdaterException(e);
+      }
+    }
+
+    private void filterColumnsInCsvWriter_WithoutManagementException(CsvWriter csvWriter)
+        throws CsvWriterException {
 
       if (this.csvWriter == null) {
 
         CsvRecordHeaderOrder csvRecordHeaderOrder = csvWriter.getCsvRecordHeaderOrder();
         csvRecordHeaderOrder.removeHeaders(columnsToBeDeleted);
+        csvWriter.setCsvRecordHeaderOrder(csvRecordHeaderOrder);
 
         this.csvWriter = csvWriter;
 

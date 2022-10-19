@@ -80,20 +80,36 @@ class CsvUpdaterImplTest {
 
 
   @Test
-  void deleteColumns() {
+  void deleteColumns() throws IOException, CsvUpdaterException, CsvReaderException {
+    Set<String> randomHeaders = getRandomHeaders(csvReaderParameters.getPath());
+    int oldNumberOfLines = getNumberOfLines(csvReaderParameters.getPath());
+    csvUpdater.deleteColumns(randomHeaders);
+
+    CsvReaderImpl csvReader = new CsvReaderImpl(csvReaderParameters);
+    csvReader.readCsvRecordHeaderValues().forEach(
+        csvRecordHeaderValues -> checkDeleteColumns(csvRecordHeaderValues, randomHeaders));
+
+    Set<String> newHeaders = getAllHeaders(csvReaderParameters.getPath());
+    int newNumberOfLines = getNumberOfLines(csvReaderParameters.getPath());
+
+    assertEquals(newNumberOfLines, oldNumberOfLines);
+    newHeaders.forEach(header -> assertTrue(!randomHeaders.contains(header)));
 
   }
 
-  // Noch nicht
-/*
-    @Test
-    void addPivotedCsvRecordHeaderValues() {
-    }
+  private void checkDeleteColumns(CsvRecordHeaderValues csvRecordHeaderValues,
+      Set<String> removedHeaders) {
+    csvRecordHeaderValues.getHeaderValueMap().keySet()
+        .forEach(header -> assertTrue(!removedHeaders.contains(header)));
+  }
 
-    @Test
-    void applyConsumer() {
-    }
-*/
+  @Test
+  void addPivotedCsvRecordHeaderValues() {
+  }
+
+  @Test
+  void applyConsumer() {
+  }
 
   private CsvReaderParameters createCsvReaderParameters() throws IOException {
 
@@ -130,6 +146,10 @@ class CsvUpdaterImplTest {
       headers.add(header);
     }
     return headers;
+  }
+
+  private int getNumberOfLines(Path path) throws IOException {
+    return ((int) Files.readAllLines(path).stream().filter(line -> line.length() > 0).count()) - 1;
   }
 
 
