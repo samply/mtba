@@ -8,6 +8,7 @@ import de.samply.file.csv.reader.CsvReaderParameters;
 import de.samply.utils.Constants;
 import de.samply.utils.RandomPathGenerator;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashSet;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -25,7 +26,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 class CsvUpdaterImplTest {
 
   private CsvUpdaterFactoryImpl csvUpdaterFactory = new CsvUpdaterFactoryImpl();
@@ -104,11 +104,76 @@ class CsvUpdaterImplTest {
   }
 
   @Test
-  void addPivotedCsvRecordHeaderValues() {
+  void addPivotedCsvRecordHeaderValues()
+      throws CsvUpdaterException, CsvReaderException, IOException {
+
+    PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues = createPivotedCsvRecordHeaderValues();
+    csvUpdater.addPivotedCsvRecordHeaderValues(pivotedCsvRecordHeaderValues);
+
+    CsvReaderImpl csvReader = new CsvReaderImpl(csvReaderParameters);
+    csvReader.readCsvRecordHeaderValues().forEach(csvRecordHeaderValues -> {
+      String pivotedValue = csvRecordHeaderValues.getValue(
+          pivotedCsvRecordHeaderValues.getPivotHeader());
+      assertNotNull(pivotedValue);
+      pivotedCsvRecordHeaderValues.getCsvRecordHeaderValues(pivotedValue).getHeaderValueMap()
+          .keySet().forEach(header -> {
+            assertEquals(
+                pivotedCsvRecordHeaderValues.getCsvRecordHeaderValues(pivotedValue).getValue(header),
+                csvRecordHeaderValues.getValue(header));
+          });
+    });
+
+  }
+
+  private PivotedCsvRecordHeaderValues createPivotedCsvRecordHeaderValues()
+      throws CsvReaderException, IOException {
+
+    String[] headers = getAllHeaders(csvReaderParameters.getPath()).toArray(String[]::new);
+    String pivotHeader = headers[0];
+    int currentNumberOfHeaders = headers.length;
+    int numberOfAdditionalHeaders = RandomPathGenerator.generateRandomNumber();
+
+    PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues = new PivotedCsvRecordHeaderValues(
+        pivotHeader);
+
+    CsvReaderImpl csvReader = new CsvReaderImpl(csvReaderParameters);
+    csvReader.readCsvRecordHeaderValues().forEach(
+        csvRecordHeaderValues -> {
+          String value = csvRecordHeaderValues.getValue(pivotHeader);
+          CsvRecordHeaderValues newCsvRecordHeaderValues = createCsvRecordHeaderValues(
+              currentNumberOfHeaders, numberOfAdditionalHeaders);
+          newCsvRecordHeaderValues.getHeaderValueMap().put(pivotHeader, value);
+          pivotedCsvRecordHeaderValues.addCsvRecordHeaderValues(newCsvRecordHeaderValues);
+        });
+
+    return pivotedCsvRecordHeaderValues;
+  }
+
+  private CsvRecordHeaderValues createCsvRecordHeaderValues(int currentNumberOfHeaders,
+      int numberOfAdditionalHeaders) {
+
+    Set<String> headers = createHeaders(currentNumberOfHeaders, numberOfAdditionalHeaders);
+    CsvRecordHeaderValues csvRecordHeaderValues = new CsvRecordHeaderValues(headers);
+
+    headers.forEach(header ->
+        Arrays.stream(RandomPathGenerator.
+                generateRandomContent(1, numberOfAdditionalHeaders)
+                .get(0)
+                .split(Constants.DEFAULT_DELIMITER))
+            .forEach(value -> csvRecordHeaderValues.getHeaderValueMap().put(header, value)));
+
+    return csvRecordHeaderValues;
+
+  }
+
+  private Set<String> createHeaders(int initialCounter, int numberOfHeaders) {
+    return Set.of(RandomPathGenerator.generateHeaders(initialCounter, numberOfHeaders)
+        .split(Constants.DEFAULT_DELIMITER));
   }
 
   @Test
   void applyConsumer() {
+
   }
 
   private CsvReaderParameters createCsvReaderParameters() throws IOException {
@@ -116,9 +181,7 @@ class CsvUpdaterImplTest {
     CsvReaderParameters csvReaderParameters = new CsvReaderParameters();
     csvReaderParameters.setPathsBundle(pathsBundle);
     Path path = pathsBundle.getAllPaths().stream().collect(Collectors.toList()).get(0);
-    //headers = getRandomHeaders(path);
 
-    //csvReaderParameters.setHeaders(headers);
     csvReaderParameters.setFilename(path.getFileName().toString());
 
     return csvReaderParameters;

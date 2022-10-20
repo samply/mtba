@@ -15,6 +15,7 @@ public class CsvRecordHeaderOrder {
 
   public void addHeader(String header, int order) {
     headerOrderMap.put(header, order);
+    headersInOrder = null;
   }
 
   public void addHeaderAtLastPosition(String header) {

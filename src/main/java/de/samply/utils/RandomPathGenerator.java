@@ -66,7 +66,7 @@ public class RandomPathGenerator {
 
   }
 
-  private static List<String> generateRandomContent() {
+  public static List<String> generateRandomContent() {
 
     List<String> randomContent = new ArrayList<>();
 
@@ -74,6 +74,34 @@ public class RandomPathGenerator {
 
     int rowsNumber = random.nextInt(10) + 5;
     int columnsNumber = random.nextInt(10) + 5;
+
+    randomContent.add(generateHeaders(0, columnsNumber));
+    randomContent.addAll(generateRandomContent(rowsNumber, columnsNumber));
+
+    return randomContent;
+
+  }
+
+  public static int generateRandomNumber(){
+    return new Random().nextInt(10) + 3;
+  }
+
+  public static String generateHeaders(int initialCounter, int columnsNumber) {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (int i = 0; i < columnsNumber; i++) {
+      stringBuilder.append(getHeader(i + initialCounter));
+      if (i < columnsNumber - 1) {
+        stringBuilder.append(Constants.DEFAULT_DELIMITER);
+      }
+    }
+    return stringBuilder.toString();
+  }
+
+  public static List<String> generateRandomContent(int rowsNumber, int columnsNumber) {
+
+    List<String> randomContent = new ArrayList<>();
+
+    Random random = new Random();
 
     List<String> randomWords = new ArrayList<>();
     for (int i = 0; i < 100; i++) {
@@ -86,8 +114,7 @@ public class RandomPathGenerator {
       StringBuilder stringBuilder = new StringBuilder();
       for (int j = 0; j < columnsNumber; j++) {
 
-        String randomWord =
-            (i == 0) ? getHeader(j + 1) : randomWords.get(random.nextInt(randomWords.size()));
+        String randomWord = randomWords.get(random.nextInt(randomWords.size()));
         stringBuilder.append(randomWord);
         if (j < columnsNumber - 1) {
           stringBuilder.append(Constants.DEFAULT_DELIMITER);
@@ -102,6 +129,7 @@ public class RandomPathGenerator {
     return randomContent;
 
   }
+
 
   /**
    * Generate header.
