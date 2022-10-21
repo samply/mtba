@@ -56,10 +56,66 @@ public class CsvUpdaterImpl implements CsvUpdater {
   @Override
   public void addPivotedCsvRecordHeaderValues(
       PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvUpdaterException {
+    applyConsumer(new AddPivotedCsvRecordHeaderValuesConsumer(pivotedCsvRecordHeaderValues));
+  }
 
-    readAndWriteAndMerge((csvWriter,
-        csvRecordHeaderValues) -> addCsvRecordHeaderValues(csvWriter, csvRecordHeaderValues,
-        pivotedCsvRecordHeaderValues));
+  private class AddPivotedCsvRecordHeaderValuesConsumer implements CsvRecordHeaderValuesConsumer {
+
+    PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues;
+
+    public AddPivotedCsvRecordHeaderValuesConsumer(
+        PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) {
+      this.pivotedCsvRecordHeaderValues = pivotedCsvRecordHeaderValues;
+    }
+
+    @Override
+    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
+        throws CsvUpdaterException {
+      try {
+        addCsvRecordHeaderValues(csvWriter, csvRecordHeaderValues,
+            pivotedCsvRecordHeaderValues);
+      } catch (CsvWriterException e) {
+        throw new CsvUpdaterException(e);
+      }
+    }
+
+    private void addCsvRecordHeaderValues(CsvWriter csvWriter,
+        CsvRecordHeaderValues csvRecordHeaderValues,
+        PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvWriterException {
+
+      String pivotHeader = pivotedCsvRecordHeaderValues.getPivotHeader();
+      String pivotValue = csvRecordHeaderValues.getValue(pivotHeader);
+      CsvRecordHeaderValues newCsvRecordHeaderValues =
+          pivotedCsvRecordHeaderValues.getCsvRecordHeaderValues(pivotValue);
+      csvRecordHeaderValues.merge(newCsvRecordHeaderValues);
+
+      csvWriter.writeCsvRecord(csvRecordHeaderValues);
+
+    }
+
+    @Override
+    public CsvRecordHeaderOrder prepareHeaders(CsvRecordHeaderOrder csvRecordHeaderOrder)
+        throws CsvUpdaterException {
+      try {
+        return prepareHeadersWithoutManagementException(csvRecordHeaderOrder);
+      } catch (CsvWriterException e) {
+        throw new CsvUpdaterException(e);
+      }
+    }
+
+    private CsvRecordHeaderOrder prepareHeadersWithoutManagementException(
+        CsvRecordHeaderOrder csvRecordHeaderOrder)
+        throws CsvWriterException {
+
+      Set<String> oldHeaders = Set.copyOf(csvRecordHeaderOrder.getHeadersInOrder());
+      pivotedCsvRecordHeaderValues.getHeaders().forEach(header -> {
+        if (!oldHeaders.contains(header)) {
+          csvRecordHeaderOrder.addHeaderAtLastPosition(header);
+        }
+      });
+      return csvRecordHeaderOrder;
+
+    }
 
   }
 
@@ -92,7 +148,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
         csvWriterParameters.getCsvRecordHeaderOrder(),
         csvWriterParameters.getOutputFilename())) {
       readAndWrite(csvReader, csvWriter, consumer);
-    } catch (CsvWriterFactoryException | IOException | CsvReaderException e) {
+    } catch (CsvWriterFactoryException | IOException | CsvReaderException | CsvWriterException e) {
       throw new CsvUpdaterException(e);
     }
 
@@ -100,8 +156,9 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   private void readAndWrite(CsvReader csvReader, CsvWriter csvWriter,
       CsvRecordHeaderValuesConsumer consumer)
-      throws CsvUpdaterException, CsvReaderException {
+      throws CsvReaderException, CsvUpdaterException, CsvWriterException {
 
+    csvWriter.setCsvRecordHeaderOrder(consumer.prepareHeaders(csvWriter.getCsvRecordHeaderOrder()));
     csvReader
         .readCsvRecordHeaderValues()
         .map(EitherUtils.liftConsumer(
@@ -132,33 +189,6 @@ public class CsvUpdaterImpl implements CsvUpdater {
 
   }
 
-  private void addCsvRecordHeaderValues(CsvWriter csvWriter,
-      CsvRecordHeaderValues csvRecordHeaderValues,
-      PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvUpdaterException {
-    try {
-      addCsvRecordHeaderValues_WithoutManagementException(csvWriter, csvRecordHeaderValues,
-          pivotedCsvRecordHeaderValues);
-    } catch (CsvWriterException e) {
-      throw new CsvUpdaterException(e);
-    }
-
-  }
-
-  private void addCsvRecordHeaderValues_WithoutManagementException(CsvWriter csvWriter,
-      CsvRecordHeaderValues csvRecordHeaderValues,
-      PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvWriterException {
-
-    String pivotHeader = pivotedCsvRecordHeaderValues.getPivotHeader();
-    String pivotValue = csvRecordHeaderValues.getValue(pivotHeader);
-    CsvRecordHeaderValues newCsvRecordHeaderValues =
-        pivotedCsvRecordHeaderValues.getCsvRecordHeaderValues(pivotValue);
-    csvRecordHeaderValues.merge(newCsvRecordHeaderValues);
-
-    csvWriter.writeCsvRecord(csvRecordHeaderValues);
-
-
-  }
-
   /**
    * Delete columns of csv.
    *
@@ -166,7 +196,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
    */
   @Override
   public void deleteColumns(Set<String> headers) throws CsvUpdaterException {
-    readAndWriteAndMerge(new DeleteColumnConsumer(headers));
+    applyConsumer(new DeleteColumnConsumer(headers));
   }
 
   private class DeleteColumnConsumer extends CsvRecordHeaderValuesCopyConsumer {
@@ -181,24 +211,24 @@ public class CsvUpdaterImpl implements CsvUpdater {
     @Override
     public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
         throws CsvUpdaterException {
-
-      filterColumnsInCsvWriter(csvWriter);
       filterHeadersInCsvRecordHeaderValues(csvRecordHeaderValues);
-
       super.accept(csvWriter, csvRecordHeaderValues);
-
     }
 
-    private void filterColumnsInCsvWriter(CsvWriter csvWriter) {
-
-      if (this.csvWriter == null) {
-
-        CsvRecordHeaderOrder csvRecordHeaderOrder = csvWriter.getCsvRecordHeaderOrder();
-        csvRecordHeaderOrder.removeHeaders(columnsToBeDeleted);
-
-        this.csvWriter = csvWriter;
-
+    @Override
+    public CsvRecordHeaderOrder prepareHeaders(CsvRecordHeaderOrder csvRecordHeaderOrder)
+        throws CsvUpdaterException {
+      try {
+        return filterColumnsInCsvWriter(csvRecordHeaderOrder);
+      } catch (CsvWriterException e) {
+        throw new CsvUpdaterException(e);
       }
+    }
+
+    private CsvRecordHeaderOrder filterColumnsInCsvWriter(CsvRecordHeaderOrder csvRecordHeaderOrder)
+        throws CsvWriterException {
+      csvRecordHeaderOrder.removeHeaders(columnsToBeDeleted);
+      return csvRecordHeaderOrder;
     }
 
     private void filterHeadersInCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues) {
@@ -216,7 +246,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
   @Override
   public void renameColumns(Map<String, String> oldHeaderToNewHeaderMap)
       throws CsvUpdaterException {
-    readAndWriteAndMerge(new RenameConsumer(oldHeaderToNewHeaderMap));
+    applyConsumer(new RenameConsumer(oldHeaderToNewHeaderMap));
   }
 
   private class RenameConsumer extends CsvRecordHeaderValuesCopyConsumer {
@@ -231,23 +261,24 @@ public class CsvUpdaterImpl implements CsvUpdater {
     @Override
     public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
         throws CsvUpdaterException {
-
-      renameCsvWriterColumns(csvWriter);
       renameCsvRecordHeaderValues(csvRecordHeaderValues);
-
       super.accept(csvWriter, csvRecordHeaderValues);
-
     }
 
-    private void renameCsvWriterColumns(CsvWriter csvWriter) {
-
-      if (this.csvWriter == null) {
-
-        this.csvWriter = csvWriter;
-        CsvRecordHeaderOrder csvRecordHeaderOrder = csvWriter.getCsvRecordHeaderOrder();
-        csvRecordHeaderOrder.renameHeaders(oldHeaderToNewHeaderMap);
-
+    @Override
+    public CsvRecordHeaderOrder prepareHeaders(CsvRecordHeaderOrder csvRecordHeaderOrder)
+        throws CsvUpdaterException {
+      try {
+        return renameCsvWriterColumns(csvRecordHeaderOrder);
+      } catch (CsvWriterException e) {
+        throw new CsvUpdaterException(e);
       }
+    }
+
+    private CsvRecordHeaderOrder renameCsvWriterColumns(CsvRecordHeaderOrder csvRecordHeaderOrder)
+        throws CsvWriterException {
+      csvRecordHeaderOrder.renameHeaders(oldHeaderToNewHeaderMap);
+      return csvRecordHeaderOrder;
     }
 
     private void renameCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues) {

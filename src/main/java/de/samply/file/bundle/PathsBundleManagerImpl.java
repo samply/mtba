@@ -22,6 +22,17 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
     this.outputFolderPath = Paths.get(outputFolderPath);
   }
 
+  /**
+   * The current implementation assumes that there is only one bundle in the whole directory.
+   *
+   * @param inputFolderPath  input folder path.
+   * @param outputFolderPath output folder path.
+   */
+  public PathsBundleManagerImpl(Path inputFolderPath, Path outputFolderPath) {
+    this.inputFolderPath = inputFolderPath;
+    this.outputFolderPath = outputFolderPath;
+  }
+
   @Override
   public boolean isNextPathsBundleInInputFolder() throws PathsBundleManagerException {
     try {

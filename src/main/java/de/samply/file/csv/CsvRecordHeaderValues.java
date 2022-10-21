@@ -10,6 +10,9 @@ public class CsvRecordHeaderValues {
 
   private Map<String, String> headerValueMap = new HashMap<>();
 
+  public CsvRecordHeaderValues(Set<String> headers) {
+    this(headers, null);
+  }
   /**
    * Values of a csv record for specified headers.
    *
@@ -18,10 +21,16 @@ public class CsvRecordHeaderValues {
    */
   public CsvRecordHeaderValues(Set<String> headers, CSVRecord csvRecord) {
 
-    for (String header : headers) {
-      String value = csvRecord.get(header);
-      if (value != null) {
-        headerValueMap.put(header, value);
+    if (csvRecord != null){
+      if (headers.size() > 0) {
+        for (String header : headers) {
+          String value = csvRecord.get(header);
+          if (value != null) {
+            headerValueMap.put(header, value);
+          }
+        }
+      } else {
+        headerValueMap = csvRecord.toMap();
       }
     }
 

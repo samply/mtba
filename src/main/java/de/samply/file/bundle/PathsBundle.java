@@ -4,6 +4,7 @@ import de.samply.utils.EitherUtils;
 import de.samply.utils.EitherUtils.ThrowingConsumer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,22 +20,42 @@ public class PathsBundle {
   private final Map<String, Path> pathMap = new HashMap<>();
 
   /**
+   * Add Paths to Paths Bundle.
+   *
+   * @param paths Paths to be added.
+   */
+  public void addPaths(Collection<Path> paths) {
+    for (Path path : paths) {
+      addPath(path);
+    }
+  }
+
+  /**
    * Add path to bundle.
    *
    * @param path path to be added.
    */
   public void addPath(Path path) {
 
-    if (path != null && Files.exists(path)) {
-      pathMap.put(path.getFileName().toString(), path);
-      setDirectory(path);
+    if (path != null) {
+      if (directory == null){
+        setDirectory(path);
+      } else{
+        path = directory.resolve(Paths.get(path.getFileName().toString()));
+      }
+      if (Files.exists(path)){
+        pathMap.put(path.getFileName().toString(), path);
+      }
     }
 
   }
 
-
-  private void setDirectory(Path path) {
-    if (directory == null && path != null) {
+  /**
+   * Set directory of paths bundle.
+   * @param path Directory of paths bundle.
+   */
+  public void setDirectory(Path path) {
+    if (directory == null && path != null && Files.exists(path.getParent())) {
       directory = path.getParent();
     }
   }

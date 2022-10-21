@@ -5,18 +5,24 @@ import de.samply.file.csv.CsvRecordHeaderOrder;
 import de.samply.file.csv.reader.CsvReaderParameters;
 import de.samply.file.csv.writer.CsvWriterException;
 import de.samply.file.csv.writer.CsvWriterParameters;
+import de.samply.utils.Constants;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVFormat.Builder;
 import org.apache.commons.csv.CSVParser;
 
 public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
 
   public static final String CSV_UPDATE_FILENAME_EXTENSION = "-updating.csv";
   private int maxNumberOfRowsPerFlush = 100;
+  private String delimiter = Constants.DEFAULT_DELIMITER;
 
+
+  public CsvUpdaterFactoryImpl() {
+  }
 
   public CsvUpdaterFactoryImpl(int maxNumberOfRowsPerFlush) {
     this.maxNumberOfRowsPerFlush = maxNumberOfRowsPerFlush;
@@ -99,7 +105,8 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
     CsvRecordHeaderOrder csvRecordHeaderOrder = new CsvRecordHeaderOrder();
 
     BufferedReader bufferedReader = Files.newBufferedReader(inputPath);
-    CSVParser csvParser = CSVFormat.DEFAULT.parse(bufferedReader);
+    CSVParser csvParser = Builder.create().setHeader().setSkipHeaderRecord(true).setDelimiter(
+        delimiter).build().parse(bufferedReader);
     int counter = 0;
     for (String header : csvParser.getHeaderNames()) {
       csvRecordHeaderOrder.addHeader(header, counter++);
@@ -107,6 +114,10 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
 
     return csvRecordHeaderOrder;
 
+  }
+
+  public void setDelimiter(String delimiter) {
+    this.delimiter = delimiter;
   }
 
 }

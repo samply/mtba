@@ -9,5 +9,6 @@ public interface CsvWriter extends Closeable {
   void writeCsvRecord(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvWriterException;
 
   CsvRecordHeaderOrder getCsvRecordHeaderOrder();
+  void setCsvRecordHeaderOrder (CsvRecordHeaderOrder csvRecordHeaderOrder) throws CsvWriterException;
 
 }

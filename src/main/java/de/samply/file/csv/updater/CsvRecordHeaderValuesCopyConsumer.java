@@ -1,5 +1,6 @@
 package de.samply.file.csv.updater;
 
+import de.samply.file.csv.CsvRecordHeaderOrder;
 import de.samply.file.csv.CsvRecordHeaderValues;
 import de.samply.file.csv.writer.CsvWriter;
 import de.samply.file.csv.writer.CsvWriterException;
@@ -15,5 +16,12 @@ public class CsvRecordHeaderValuesCopyConsumer implements CsvRecordHeaderValuesC
       throw new CsvUpdaterException(e);
     }
   }
+
+  @Override
+  public CsvRecordHeaderOrder prepareHeaders(CsvRecordHeaderOrder csvRecordHeaderOrder)
+      throws CsvUpdaterException {
+    return csvRecordHeaderOrder;
+  }
+
 
 }
