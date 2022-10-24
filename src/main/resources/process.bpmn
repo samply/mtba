@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0fr9mxs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.4.2">
+  <bpmn:process id="mtba" name="MTBA" isExecutable="true" camunda:versionTag="1.0.0">
+    <bpmn:sequenceFlow id="SequenceFlow_1fp17al" sourceRef="checkForNewFiles" targetRef="createBundle" />
+    <bpmn:sequenceFlow id="Flow_0ylx2z9" sourceRef="createBundle" targetRef="generatePseudonyms" />
+    <bpmn:sequenceFlow id="Flow_03aus3d" sourceRef="StartEvent_1" targetRef="checkForNewFiles" />
+    <bpmn:sequenceFlow id="Flow_0t5rofk" sourceRef="generatePseudonyms" targetRef="fetchClinicalDataAndMerge" />
+    <bpmn:sequenceFlow id="Flow_1o9snyl" sourceRef="generatePseudonyms" targetRef="convertToFHIR" />
+    <bpmn:sequenceFlow id="Flow_1r7tunv" sourceRef="convertToFHIR" targetRef="exportToBlaze" />
+    <bpmn:sequenceFlow id="Flow_111m9ho" sourceRef="fetchClinicalDataAndMerge" targetRef="exportToCBioportal" />
+    <bpmn:userTask id="exportToCBioportal" name="Export to cBioportal">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="pathBundle" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_111m9ho</bpmn:incoming>
+      <bpmn:outgoing>Flow_043igg3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_1u5lmvr">
+      <bpmn:incoming>Flow_043igg3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_043igg3" sourceRef="exportToCBioportal" targetRef="Event_1u5lmvr" />
+    <bpmn:endEvent id="Event_184wxjd">
+      <bpmn:incoming>Flow_01i4yx6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_01i4yx6" sourceRef="exportToBlaze" targetRef="Event_184wxjd" />
+    <bpmn:serviceTask id="checkForNewFiles" name="Check for New Files" camunda:class="de.samply.tasks.FilesChecker">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="newFiles" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_03aus3d</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1fp17al</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="createBundle" name="Create Bundle" camunda:class="de.samply.tasks.BundleCreator">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="newFiles" />
+          <camunda:outputParameter name="pathBundle" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ylx2z9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="generatePseudonyms" name="Generate Pseudonyms" camunda:class="de.samply.tasks.PseudonymGenerator">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="pathBundle" />
+          <camunda:outputParameter name="pathBundle" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ylx2z9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0t5rofk</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1o9snyl</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="fetchClinicalDataAndMerge" name="Fetch Clinical Data and Merge" camunda:class="de.samply.tasks.ClinicalDataMerger">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="pathBundle" />
+          <camunda:outputParameter name="pathBundle" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0t5rofk</bpmn:incoming>
+      <bpmn:outgoing>Flow_111m9ho</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="convertToFHIR" name="Convert to FHIR" camunda:class="de.samply.tasks.FhirConverter">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="pathBundle" />
+          <camunda:outputParameter name="fhirBundle" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1o9snyl</bpmn:incoming>
+      <bpmn:outgoing>Flow_1r7tunv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="exportToBlaze" name="Export to Blaze" camunda:class="de.samply.tasks.BlazeExporter">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="fhirBundle" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1r7tunv</bpmn:incoming>
+      <bpmn:outgoing>Flow_01i4yx6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_03aus3d</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_05lxif2">
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0/1 * * * ?</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="mtba">
+      <bpmndi:BPMNShape id="Activity_0t5f8b5_di" bpmnElement="exportToCBioportal">
+        <dc:Bounds x="900" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1u5lmvr_di" bpmnElement="Event_1u5lmvr">
+        <dc:Bounds x="1062" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_184wxjd_di" bpmnElement="Event_184wxjd">
+        <dc:Bounds x="1062" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1qnes8z_di" bpmnElement="checkForNewFiles">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nuawcp_di" bpmnElement="createBundle">
+        <dc:Bounds x="420" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bqth3n_di" bpmnElement="generatePseudonyms">
+        <dc:Bounds x="579" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_150x8ez_di" bpmnElement="fetchClinicalDataAndMerge">
+        <dc:Bounds x="740" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1lei2d3_di" bpmnElement="convertToFHIR">
+        <dc:Bounds x="740" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1pohgy8_di" bpmnElement="exportToBlaze">
+        <dc:Bounds x="900" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1wxs6uw_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1fp17al_di" bpmnElement="SequenceFlow_1fp17al">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="420" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ylx2z9_di" bpmnElement="Flow_0ylx2z9">
+        <di:waypoint x="520" y="117" />
+        <di:waypoint x="579" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03aus3d_di" bpmnElement="Flow_03aus3d">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0t5rofk_di" bpmnElement="Flow_0t5rofk">
+        <di:waypoint x="679" y="117" />
+        <di:waypoint x="740" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o9snyl_di" bpmnElement="Flow_1o9snyl">
+        <di:waypoint x="679" y="117" />
+        <di:waypoint x="710" y="117" />
+        <di:waypoint x="710" y="230" />
+        <di:waypoint x="740" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1r7tunv_di" bpmnElement="Flow_1r7tunv">
+        <di:waypoint x="840" y="230" />
+        <di:waypoint x="900" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_111m9ho_di" bpmnElement="Flow_111m9ho">
+        <di:waypoint x="840" y="117" />
+        <di:waypoint x="900" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_043igg3_di" bpmnElement="Flow_043igg3">
+        <di:waypoint x="1000" y="117" />
+        <di:waypoint x="1062" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01i4yx6_di" bpmnElement="Flow_01i4yx6">
+        <di:waypoint x="1000" y="230" />
+        <di:waypoint x="1062" y="230" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

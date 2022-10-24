@@ -16,3 +16,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - CSV Updater: Delete columns
 - Interfaces for csv reader, writer and updater
 - Tests
+- BPMN (Camunda)
