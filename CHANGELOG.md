@@ -17,3 +17,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Interfaces for csv reader, writer and updater
 - Tests
 - BPMN (Camunda)
+- Docker
