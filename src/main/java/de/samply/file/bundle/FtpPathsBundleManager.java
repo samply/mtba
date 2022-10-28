@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import org.apache.commons.net.ftp.FTPClient;
 
 public class FtpPathsBundleManager extends PathsBundleManagerImpl implements PathsBundleManager {
@@ -14,42 +15,45 @@ public class FtpPathsBundleManager extends PathsBundleManagerImpl implements Pat
 
   /**
    * Moves paths bundle to external directory through FTP.
-   * @param inputFolderPath source input folder path.
-   * @param outputFolderPath output folder path in ftp server.
-   * @param ftpServerConfig ftp server configuration.
+   *
+   * @param inputFolderPath  source input folder path.
+   * @param ftpServerConfig  ftp server configuration.
    */
-  public FtpPathsBundleManager(String inputFolderPath, String outputFolderPath,
-      FtpServerConfig ftpServerConfig) {
-    super(inputFolderPath, outputFolderPath);
+  public FtpPathsBundleManager(String inputFolderPath, FtpServerConfig ftpServerConfig) {
+    super(inputFolderPath);
     this.ftpServerConfig = ftpServerConfig;
 
   }
 
   @Override
-  protected void moveFileToOutputFolder(Path path) throws PathsBundleManagerException {
+  protected void moveFileToOutputFolder(Path path, Path outputFolderPath) throws PathsBundleManagerException {
 
     try (FtpClientCloseable ftpClientCloseable = new FtpClientCloseable(ftpServerConfig)) {
-      moveFileToOutputFolder(ftpClientCloseable.getFtpClient(), path);
+      moveFileToOutputFolder(ftpClientCloseable.getFtpClient(), path, outputFolderPath);
     } catch (IOException e) {
       throw new PathsBundleManagerException(e);
     }
 
   }
 
-  private void moveFileToOutputFolder(FTPClient ftpClient, Path path)
+  private void moveFileToOutputFolder(FTPClient ftpClient, Path path, Path outputFolderPath)
       throws PathsBundleManagerException {
 
     try (InputStream pathInputStream = Files.newInputStream(path)) {
-      moveFileToOutputFolder(ftpClient, pathInputStream);
+      moveFileToOutputFolder(ftpClient, pathInputStream, outputFolderPath);
     } catch (IOException e) {
       throw new PathsBundleManagerException(e);
     }
 
   }
 
-  private void moveFileToOutputFolder(FTPClient ftpClient, InputStream pathInputStream)
+  private void moveFileToOutputFolder(FTPClient ftpClient, InputStream pathInputStream, Path outputFolderPath)
       throws IOException {
     ftpClient.storeFile(outputFolderPath.toString(), pathInputStream);
   }
 
+  @Override
+  protected void copyFileToOutputFolder(Path path, Path outputFolderPath) throws PathsBundleManagerException {
+    moveFileToOutputFolder(path, outputFolderPath);
+  }
 }

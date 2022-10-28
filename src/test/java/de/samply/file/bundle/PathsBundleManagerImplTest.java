@@ -29,7 +29,7 @@ class PathsBundleManagerImplTest {
     inputFolderPath = RandomPathGenerator.createRandomCsvPaths(FILES_NUMBER).get(0).getParent();
     outputFolderPath = RandomPathGenerator.createRandomDirectory();
 
-    pathsBundleManager = new PathsBundleManagerImpl(inputFolderPath, outputFolderPath);
+    pathsBundleManager = new PathsBundleManagerImpl(inputFolderPath);
 
   }
 
@@ -50,7 +50,7 @@ class PathsBundleManagerImplTest {
     PathsBundle pathsBundle = pathsBundleManager.fetchNextPathsBundleFromInputFolder();
     assertEquals(FILES_NUMBER, pathsBundle.getAllPaths().size());
 
-    pathsBundleManager.movePathsBundleToOutputFolder(pathsBundle);
+    pathsBundleManager.movePathsBundleToOutputFolder(pathsBundle, outputFolderPath);
     int numberOfFilesInInputFolder = getNumberOfFiles(inputFolderPath);
     int numberOfFilesInOutputFolder = getNumberOfFiles(outputFolderPath);
 

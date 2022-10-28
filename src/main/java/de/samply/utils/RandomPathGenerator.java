@@ -43,7 +43,17 @@ public class RandomPathGenerator {
    * @throws IOException IO Exception.
    */
   public static Path createRandomDirectory() throws IOException {
-    return Files.createTempDirectory(Paths.get(DEFAULT_DIRECTORY), TEMP_DIRECTORY_PREFIX);
+    return createRandomDirectory(DEFAULT_DIRECTORY);
+  }
+
+  /**
+   * Create random directory.
+   *
+   * @return Path of new random directory.
+   * @throws IOException IO Exception.
+   */
+  public static Path createRandomDirectory(String rootDirectory) throws IOException {
+    return Files.createTempDirectory(Paths.get(rootDirectory), TEMP_DIRECTORY_PREFIX);
   }
 
   /**

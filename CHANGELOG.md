@@ -18,3 +18,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Tests
 - BPMN (Camunda)
 - Docker
+- Generate Bundle Delegate

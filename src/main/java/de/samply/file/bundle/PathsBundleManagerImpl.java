@@ -9,28 +9,23 @@ import java.nio.file.StandardCopyOption;
 public class PathsBundleManagerImpl implements PathsBundleManager {
 
   protected Path inputFolderPath;
-  protected Path outputFolderPath;
 
   /**
    * The current implementation assumes that there is only one bundle in the whole directory.
    *
    * @param inputFolderPath  input folder path.
-   * @param outputFolderPath output folder path.
    */
-  public PathsBundleManagerImpl(String inputFolderPath, String outputFolderPath) {
+  public PathsBundleManagerImpl(String inputFolderPath) {
     this.inputFolderPath = Paths.get(inputFolderPath);
-    this.outputFolderPath = Paths.get(outputFolderPath);
   }
 
   /**
    * The current implementation assumes that there is only one bundle in the whole directory.
    *
    * @param inputFolderPath  input folder path.
-   * @param outputFolderPath output folder path.
    */
-  public PathsBundleManagerImpl(Path inputFolderPath, Path outputFolderPath) {
+  public PathsBundleManagerImpl(Path inputFolderPath) {
     this.inputFolderPath = inputFolderPath;
-    this.outputFolderPath = outputFolderPath;
   }
 
   @Override
@@ -59,14 +54,11 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
   private PathsBundle fetchNextPathsBundleFromInputFolder_WithoutManagementException()
       throws PathsBundleManagerException, IOException {
 
-    PathsBundle pathsBundle = null;
+    PathsBundle pathsBundle = new PathsBundle();
 
     if (isNextPathsBundleInInputFolder()) {
-
-      pathsBundle = new PathsBundle();
       PathsBundle finalPathsBundle = pathsBundle;
       Files.list(inputFolderPath).forEach(path -> finalPathsBundle.addPath(path));
-
     }
 
     return pathsBundle;
@@ -74,18 +66,43 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
   }
 
   @Override
-  public void movePathsBundleToOutputFolder(PathsBundle pathsBundle)
+  public void movePathsBundleToOutputFolder(PathsBundle pathsBundle, Path outputFolderPath)
       throws PathsBundleManagerException {
 
     if (pathsBundle != null) {
-      pathsBundle.applyToAllPaths(path -> moveFileToOutputFolder(path));
+      pathsBundle.applyToAllPaths(path -> moveFileToOutputFolder(path, outputFolderPath));
+      pathsBundle.setDirectory(outputFolderPath);
     }
 
   }
 
-  protected void moveFileToOutputFolder(Path path) throws PathsBundleManagerException {
+  @Override
+  public PathsBundle copyPathsBundleToOutputFolder(PathsBundle pathsBundle, Path outputFolderPath)
+      throws PathsBundleManagerException {
+
+    PathsBundle pathsBundle2 = null;
+    if (pathsBundle != null) {
+      pathsBundle2 = pathsBundle.clone();
+      pathsBundle2.applyToAllPaths(path -> copyFileToOutputFolder(path, outputFolderPath));
+      pathsBundle2.setDirectory(outputFolderPath);
+    }
+
+    return pathsBundle2;
+
+  }
+
+  protected void moveFileToOutputFolder(Path path, Path outputFolderPath) throws PathsBundleManagerException {
     try {
       Files.move(path, outputFolderPath.resolve(path.getFileName()),
+          StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      throw new PathsBundleManagerException(e);
+    }
+  }
+
+  protected void copyFileToOutputFolder(Path path, Path outputFolderPath) throws PathsBundleManagerException {
+    try {
+      Files.copy(path, outputFolderPath.resolve(path.getFileName()),
           StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
       throw new PathsBundleManagerException(e);

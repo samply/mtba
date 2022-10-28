@@ -132,4 +132,17 @@ public class PathsBundle {
 
   }
 
+  public boolean isPathBundleEmpty(){
+    return pathMap.isEmpty();
+  }
+
+  public PathsBundle clone(){
+    PathsBundle pathsBundle = new PathsBundle();
+
+    pathsBundle.setDirectory(this.directory);
+    pathsBundle.addPaths(this.getAllPaths());
+
+    return pathsBundle;
+  }
+
 }
