@@ -4,6 +4,7 @@ import de.samply.file.bundle.PathsBundle;
 import de.samply.file.bundle.PathsBundleManager;
 import de.samply.file.bundle.PathsBundleManagerImpl;
 import de.samply.spring.MtbaConst;
+import de.samply.utils.PathsBundleUtils;
 import de.samply.utils.TemporalDirectoryManager;
 import java.nio.file.Path;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -36,7 +37,7 @@ public class PathsBundleFactoryDelegate implements JavaDelegate {
     if (!pathsBundle.isPathBundleEmpty()) {
       Path outputDirectory = temporalDirectoryManager.createTemporalDirectory();
       pathsBundleManager.movePathsBundleToOutputFolder(pathsBundle, outputDirectory);
-      delegateExecution.setVariable(MtbaConst.PATHS_BUNDLE, pathsBundle);
+      PathsBundleUtils.addPathsBundleAsVariable(delegateExecution, pathsBundle);
     }
 
   }

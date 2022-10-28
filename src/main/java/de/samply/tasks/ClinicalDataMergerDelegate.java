@@ -4,6 +4,7 @@ import de.samply.file.bundle.PathsBundle;
 import de.samply.file.bundle.PathsBundleManager;
 import de.samply.file.bundle.PathsBundleManagerImpl;
 import de.samply.spring.MtbaConst;
+import de.samply.utils.PathsBundleUtils;
 import de.samply.utils.TemporalDirectoryManager;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -22,7 +23,7 @@ public class ClinicalDataMergerDelegate implements JavaDelegate {
   public void execute(DelegateExecution delegateExecution) throws Exception {
 
     logger.info("Fetch clinical data and merge");
-    PathsBundle pathsBundle = (PathsBundle) delegateExecution.getVariable(MtbaConst.PATHS_BUNDLE);
+    PathsBundle pathsBundle = PathsBundleUtils.getPathsBundleVariable(delegateExecution);
     PathsBundleManager pathsBundleManager = new PathsBundleManagerImpl(pathsBundle.getDirectory());
     pathsBundle = pathsBundleManager.copyPathsBundleToOutputFolder(pathsBundle,
         temporalDirectoryManager.createTemporalDirectory());

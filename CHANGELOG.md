@@ -19,3 +19,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - BPMN (Camunda)
 - Docker
 - Generate Bundle Delegate
+- PathsBundle Serialization

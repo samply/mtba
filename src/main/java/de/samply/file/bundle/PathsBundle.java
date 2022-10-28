@@ -2,6 +2,7 @@ package de.samply.file.bundle;
 
 import de.samply.utils.EitherUtils;
 import de.samply.utils.EitherUtils.ThrowingConsumer;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
