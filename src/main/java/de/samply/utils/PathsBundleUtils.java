@@ -22,11 +22,12 @@ public class PathsBundleUtils {
   }
 
   public static void addPathsBundleAsVariable (DelegateExecution delegateExecution, PathsBundle pathsBundle){
-    delegateExecution.setVariable(MtbaConst.PATHS_BUNDLE, convert(pathsBundle));
+    delegateExecution.setVariable(MtbaConst.PATHS_BUNDLE, convert(pathsBundle).toString());
   }
 
   public static PathsBundle getPathsBundleVariable (DelegateExecution delegateExecution){
-    return convert ((JSONArray) delegateExecution.getVariable(MtbaConst.PATHS_BUNDLE));
+    String pathBundle = (String) delegateExecution.getVariable(MtbaConst.PATHS_BUNDLE);
+    return (pathBundle != null) ? convert (new JSONArray(pathBundle)) : new PathsBundle();
   }
 
 }

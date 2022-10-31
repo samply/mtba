@@ -18,6 +18,7 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
   public void execute(DelegateExecution delegateExecution) throws Exception {
     logger.info("Generate pseudonyms");
     PathsBundle pathsBundle = PathsBundleUtils.getPathsBundleVariable(delegateExecution);
+    System.out.println("hello");
     //TODO
 
   }

@@ -70,7 +70,7 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
       throws PathsBundleManagerException {
 
     if (pathsBundle != null) {
-      pathsBundle.applyToAllPaths(path -> moveFileToOutputFolder(path, outputFolderPath));
+      pathsBundle.applyToAllPaths(path -> pathsBundle.addPath(moveFileToOutputFolder(pathsBundle, path, outputFolderPath)));
       pathsBundle.setDirectory(outputFolderPath);
     }
 
@@ -83,7 +83,7 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
     PathsBundle pathsBundle2 = null;
     if (pathsBundle != null) {
       pathsBundle2 = pathsBundle.clone();
-      pathsBundle2.applyToAllPaths(path -> copyFileToOutputFolder(path, outputFolderPath));
+      pathsBundle2.applyToAllPaths(path -> copyFileToOutputFolder(pathsBundle, path, outputFolderPath));
       pathsBundle2.setDirectory(outputFolderPath);
     }
 
@@ -91,19 +91,28 @@ public class PathsBundleManagerImpl implements PathsBundleManager {
 
   }
 
-  protected void moveFileToOutputFolder(Path path, Path outputFolderPath) throws PathsBundleManagerException {
+  protected Path moveFileToOutputFolder(PathsBundle pathsBundle, Path path, Path outputFolderPath) throws PathsBundleManagerException {
     try {
-      Files.move(path, outputFolderPath.resolve(path.getFileName()),
-          StandardCopyOption.REPLACE_EXISTING);
+      Path tempPath = pathsBundle.getDirectory().relativize(path);
+      Path tempPath2 = Paths.get(outputFolderPath.toString(), tempPath.toString());
+      if (!Files.exists(tempPath2.getParent())){
+        Files.createDirectory(tempPath2.getParent());
+      }
+      Files.move(path, tempPath2, StandardCopyOption.REPLACE_EXISTING);
+      return tempPath2;
     } catch (IOException e) {
       throw new PathsBundleManagerException(e);
     }
   }
 
-  protected void copyFileToOutputFolder(Path path, Path outputFolderPath) throws PathsBundleManagerException {
+  protected void copyFileToOutputFolder(PathsBundle pathsBundle, Path path, Path outputFolderPath) throws PathsBundleManagerException {
     try {
-      Files.copy(path, outputFolderPath.resolve(path.getFileName()),
-          StandardCopyOption.REPLACE_EXISTING);
+      Path tempPath = pathsBundle.getDirectory().relativize(path);
+      Path tempPath2 = Paths.get(outputFolderPath.toString(), tempPath.toString());
+      if (!Files.exists(tempPath2.getParent())){
+        Files.createDirectory(tempPath2.getParent());
+      }
+      Files.copy(path, tempPath2, StandardCopyOption.REPLACE_EXISTING);
     } catch (IOException e) {
       throw new PathsBundleManagerException(e);
     }

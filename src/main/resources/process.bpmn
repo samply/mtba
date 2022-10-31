@@ -6,59 +6,32 @@
     <bpmn:sequenceFlow id="Flow_1r7tunv" sourceRef="convertToFHIR" targetRef="exportToBlaze" />
     <bpmn:sequenceFlow id="Flow_111m9ho" sourceRef="fetchClinicalDataAndMerge" targetRef="exportToCBioportal" />
     <bpmn:userTask id="exportToCBioportal" name="Export to cBioportal">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="pathsBundle" />
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_111m9ho</bpmn:incoming>
       <bpmn:outgoing>Flow_1ej3zdr</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:serviceTask id="createPathsBundle" name="Create Paths Bundle" camunda:class="de.samply.tasks.PathsBundleFactoryDelegate">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:outputParameter name="pathsBundle" />
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_03aus3d</bpmn:incoming>
       <bpmn:outgoing>Flow_0ylx2z9</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="generatePseudonyms" name="Generate Pseudonyms" camunda:class="de.samply.tasks.PseudonymGeneratorDelegate">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="pathsBundle" />
-          <camunda:outputParameter name="pathsBundle" />
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_17mgv6r</bpmn:incoming>
       <bpmn:outgoing>Flow_0gz0egd</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="fetchClinicalDataAndMerge" name="Fetch Clinical Data and Merge" camunda:class="de.samply.tasks.ClinicalDataMergerDelegate">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="pathsBundle" />
-          <camunda:outputParameter name="pathsBundle" />
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_1itvtf1</bpmn:incoming>
       <bpmn:outgoing>Flow_111m9ho</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="convertToFHIR" name="Convert to FHIR" camunda:class="de.samply.tasks.FhirConverterDelegate">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="pathsBundle" />
-          <camunda:outputParameter name="fhirBundle" />
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_0ilthkg</bpmn:incoming>
       <bpmn:outgoing>Flow_1r7tunv</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="exportToBlaze" name="Export to Blaze" camunda:class="de.samply.tasks.BlazeExporterDelegate">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="fhirBundle" />
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_1r7tunv</bpmn:incoming>
       <bpmn:outgoing>Flow_0815yfn</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -83,11 +56,7 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isPathsBundleEmpty}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:serviceTask id="persistFiles" name="Persist Files" camunda:class="de.samply.tasks.PathsBundlePersisterDelegate">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="pathsBundle" />
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:incoming>Flow_1276i8r</bpmn:incoming>
       <bpmn:outgoing>Flow_1mxexjy</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -130,9 +99,6 @@
         <dc:Bounds x="270" y="177" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1bqth3n_di" bpmnElement="generatePseudonyms">
-        <dc:Bounds x="550" y="177" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_150x8ez_di" bpmnElement="fetchClinicalDataAndMerge">
         <dc:Bounds x="840" y="64" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -169,6 +135,9 @@
       <bpmndi:BPMNShape id="Gateway_06byjxu_di" bpmnElement="Gateway_1wb7r9a">
         <dc:Bounds x="755" y="192" width="50" height="50" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bqth3n_di" bpmnElement="generatePseudonyms">
+        <dc:Bounds x="550" y="177" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0ylx2z9_di" bpmnElement="Flow_0ylx2z9">
         <di:waypoint x="370" y="217" />
         <di:waypoint x="445" y="217" />
@@ -189,7 +158,7 @@
         <di:waypoint x="495" y="217" />
         <di:waypoint x="550" y="217" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="515" y="222" width="15" height="14" />
+          <dc:Bounds x="516" y="222" width="15" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1x7rfg1_di" bpmnElement="Flow_1x7rfg1">

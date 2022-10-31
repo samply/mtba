@@ -26,10 +26,12 @@ public class FtpPathsBundleManager extends PathsBundleManagerImpl implements Pat
   }
 
   @Override
-  protected void moveFileToOutputFolder(Path path, Path outputFolderPath) throws PathsBundleManagerException {
+  protected Path moveFileToOutputFolder(PathsBundle pathsBundle, Path path, Path outputFolderPath) throws PathsBundleManagerException {
 
     try (FtpClientCloseable ftpClientCloseable = new FtpClientCloseable(ftpServerConfig)) {
-      moveFileToOutputFolder(ftpClientCloseable.getFtpClient(), path, outputFolderPath);
+      Path tempPath = pathsBundle.getDirectory().relativize(path);
+      moveFileToOutputFolder(ftpClientCloseable.getFtpClient(), tempPath, outputFolderPath);
+      return outputFolderPath.resolve(tempPath);
     } catch (IOException e) {
       throw new PathsBundleManagerException(e);
     }
@@ -53,7 +55,7 @@ public class FtpPathsBundleManager extends PathsBundleManagerImpl implements Pat
   }
 
   @Override
-  protected void copyFileToOutputFolder(Path path, Path outputFolderPath) throws PathsBundleManagerException {
-    moveFileToOutputFolder(path, outputFolderPath);
+  protected void copyFileToOutputFolder(PathsBundle pathsBundle, Path path, Path outputFolderPath) throws PathsBundleManagerException {
+    moveFileToOutputFolder(pathsBundle, path, outputFolderPath);
   }
 }
