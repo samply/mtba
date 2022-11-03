@@ -20,3 +20,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Docker
 - Generate Bundle Delegate
 - PathsBundle Serialization
+- Java 17

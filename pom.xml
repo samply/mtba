@@ -76,7 +76,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <java.version>15</java.version>
+    <java.version>17</java.version>
     <spring-boot.version>2.7.3</spring-boot.version>
     <camunda.version>7.18.0</camunda.version>
 
