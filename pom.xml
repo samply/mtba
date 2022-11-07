@@ -88,6 +88,8 @@
     <slf4j-api.version>1.7.36</slf4j-api.version>
     <log4j-slf4j-impl.version>2.18.0</log4j-slf4j-impl.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
+    <jython.version>2.7.3</jython.version>
+    <json.version>20220924</json.version>
   </properties>
 
   <dependencyManagement>
@@ -146,6 +148,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
     </dependency>
@@ -191,9 +197,13 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20220924</version>
+      <version>${json.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <version>${jython.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
