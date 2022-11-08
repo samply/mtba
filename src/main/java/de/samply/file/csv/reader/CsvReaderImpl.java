@@ -80,14 +80,9 @@ public class CsvReaderImpl implements CsvReader {
   private Iterable<CSVRecord> fetchCsvRecords_WithoutManagementException(Reader reader)
       throws IOException {
 
-    Builder builder = Builder.create();
-    if (!csvReaderParameters.readAllHeaders()) {
-      builder.setHeader(csvReaderParameters.getHeaders().toArray(new String[0]));
-    } else{
-      builder.setHeader();
-    }
-
-    return builder.setSkipHeaderRecord(true)
+    return Builder.create()
+        .setHeader()
+        .setSkipHeaderRecord(true)
         .setIgnoreEmptyLines(true)
         .setIgnoreHeaderCase(true)
         .setDelimiter(delimiter)

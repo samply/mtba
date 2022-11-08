@@ -9,6 +9,7 @@ public class MtbaConst {
   // Environment Variables
   public final static String ID_MANAGER_API_KEY = "ID_MANAGER_API_KEY";
   public final static String ID_MANAGER_URL = "ID_MANAGER_URL";
+  public final static String ID_MANAGER_PSEUDONYM_ID_TYPE = "ID_MANAGER_PSEUDONYM_ID_TYPE";
   public final static String LOCAL_ID_CSV_FILENAME = "LOCAL_ID_CSV_FILENAME";
   public final static String LOCAL_ID_CSV_LOCAL_ID_HEADER = "LOCAL_ID_CSV_LOCAL_ID_HEADER";
   public final static String IDAT_CSV_FILENAME = "IDAT_CSV_FILENAME";
@@ -32,6 +33,7 @@ public class MtbaConst {
   public final static String PERSIST_DIRECTORY_SV = HEAD_SV + PERSIST_DIRECTORY + ":#{'./mtba-files/persist'}" + BOTTOM_SV;
   public final static String ID_MANAGER_URL_SV = HEAD_SV + ID_MANAGER_URL + ":#{null}" + BOTTOM_SV;
   public final static String ID_MANAGER_API_KEY_SV = HEAD_SV + ID_MANAGER_API_KEY + ":#{null}" + BOTTOM_SV;
+  public final static String ID_MANAGER_PSEUDONYM_ID_TYPE_SV = HEAD_SV + ID_MANAGER_PSEUDONYM_ID_TYPE + ":#{null}" + BOTTOM_SV;
   public final static String LOCAL_ID_CSV_FILENAME_SV = HEAD_SV + LOCAL_ID_CSV_FILENAME + ":#{null}" + BOTTOM_SV;
   public final static String LOCAL_ID_CSV_LOCAL_ID_HEADER_SV = HEAD_SV + LOCAL_ID_CSV_LOCAL_ID_HEADER + ":#{null}" + BOTTOM_SV;
   public final static String IDAT_CSV_FILENAME_SV = HEAD_SV + IDAT_CSV_FILENAME + ":#{null}" + BOTTOM_SV;
@@ -41,7 +43,7 @@ public class MtbaConst {
   public final static String IDAT_CSV_BIRTHDAY_HEADER_SV = HEAD_SV + IDAT_CSV_BIRTHDAY_HEADER + ":#{null}" + BOTTOM_SV;
   public final static String IDAT_CSV_CITIZENSHIP_HEADER_SV = HEAD_SV + IDAT_CSV_CITIZENSHIP_HEADER + ":#{null}" + BOTTOM_SV;
   public final static String IDAT_CSV_GENDER_HEADER_SV = HEAD_SV + IDAT_CSV_GENDER_HEADER + ":#{null}" + BOTTOM_SV;
-  public final static String FHIR_BUNDLE_CSV_FILENAME_SV = HEAD_SV + FHIR_BUNDLE_CSV_FILENAME + ":#{data_mutations_extended.txt}" + BOTTOM_SV;
+  public final static String FHIR_BUNDLE_CSV_FILENAME_SV = HEAD_SV + FHIR_BUNDLE_CSV_FILENAME + ":#{'data_mutations_extended.txt'}" + BOTTOM_SV;
 
 
 

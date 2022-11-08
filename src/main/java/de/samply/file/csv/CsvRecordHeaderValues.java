@@ -10,8 +10,10 @@ public class CsvRecordHeaderValues {
 
   private Map<String, String> headerValueMap = new HashMap<>();
 
-  public CsvRecordHeaderValues(Set<String> headers) {
-    this(headers, null);
+  public CsvRecordHeaderValues() {}
+
+  public CsvRecordHeaderValues(Map<String,String> headerValuesMap){
+    this.headerValueMap = headerValuesMap;
   }
   /**
    * Values of a csv record for specified headers.

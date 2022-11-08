@@ -22,3 +22,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - PathsBundle Serialization
 - Java 17
 - FHIR Converter
+- Bugfix: CsvReader
+- Generate Pseudonyms

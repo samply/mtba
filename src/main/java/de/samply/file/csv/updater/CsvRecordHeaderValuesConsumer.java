@@ -6,8 +6,7 @@ import de.samply.file.csv.writer.CsvWriter;
 
 public interface CsvRecordHeaderValuesConsumer {
 
-  void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
-      throws CsvUpdaterException;
+  void accept(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException;
 
   CsvRecordHeaderOrder prepareHeaders(CsvRecordHeaderOrder csvRecordHeaderOrder)
       throws CsvUpdaterException;

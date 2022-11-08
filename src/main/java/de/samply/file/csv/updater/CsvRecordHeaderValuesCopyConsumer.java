@@ -8,13 +8,7 @@ import de.samply.file.csv.writer.CsvWriterException;
 public class CsvRecordHeaderValuesCopyConsumer implements CsvRecordHeaderValuesConsumer {
 
   @Override
-  public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
-      throws CsvUpdaterException {
-    try {
-      csvWriter.writeCsvRecord(csvRecordHeaderValues);
-    } catch (CsvWriterException e) {
-      throw new CsvUpdaterException(e);
-    }
+  public void accept(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
   }
 
   @Override
