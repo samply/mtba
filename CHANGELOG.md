@@ -24,3 +24,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - FHIR Converter
 - Bugfix: CsvReader
 - Generate Pseudonyms
+- ID-Manager Paging

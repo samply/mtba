@@ -20,14 +20,17 @@ import de.samply.pseudonymisation.PseudonymisationClient;
 import de.samply.spring.MtbaConst;
 import de.samply.utils.PathsBundleUtils;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.python.apache.commons.compress.utils.Lists;
@@ -92,7 +95,9 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
   public void execute(DelegateExecution delegateExecution) throws Exception {
     logger.info("Generate pseudonyms");
     PathsBundle pathsBundle = PathsBundleUtils.getPathsBundleVariable(delegateExecution);
-    if (localIdCsvFilename != null) {
+    if (containsAlreadyIdManagerPseudonymIdType(pathsBundle)) {
+      removeIdatAndTempIdHeaders(pathsBundle);
+    } else if (localIdCsvFilename != null) {
       fetchPseudonymsFromLocalId(pathsBundle);
     } else if (idatCsvFilename != null) {
       fetchPseudonymsFromIdat(pathsBundle);
@@ -101,15 +106,13 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
 
   private void fetchPseudonymsFromLocalId(PathsBundle pathsBundle)
       throws CsvUpdaterFactoryException {
-    CsvUpdater csvUpdater = csvUpdaterFactory.createCsvUpdater(
-        createCsvReaderParametersForUpdater(pathsBundle, localIdCsvFilename));
+    CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, localIdCsvFilename);
     //TODO
   }
 
   private void fetchPseudonymsFromIdat(PathsBundle pathsBundle)
       throws CsvUpdaterFactoryException, CsvUpdaterException, CsvReaderException, IOException {
-    CsvUpdater csvUpdater = csvUpdaterFactory.createCsvUpdater(
-        createCsvReaderParametersForUpdater(pathsBundle, idatCsvFilename));
+    CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, idatCsvFilename);
     // Add temporal id as column. This works as pivot.
     csvUpdater.applyConsumer(new TempIdCsvRecordHeaderValuesConsumer());
     // Read IDAT and pseudonomyze.
@@ -119,6 +122,25 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
     csvUpdater.addPivotedCsvRecordHeaderValues(
         createPivotedCsvRecordHeaderValues(patIdPseudonymMap));
     // Remove IDAT and temporal id columns.
+    removeIdatAndTempIdHeaders(csvUpdater);
+  }
+
+  private CsvUpdater createCsvUpdater(PathsBundle pathsBundle, String filename)
+      throws CsvUpdaterFactoryException {
+    return csvUpdaterFactory.createCsvUpdater(
+        createCsvReaderParametersForUpdater(pathsBundle, idatCsvFilename));
+  }
+
+  private void removeIdatAndTempIdHeaders(PathsBundle pathsBundle)
+      throws CsvUpdaterException, CsvUpdaterFactoryException {
+    String filename = getActiveFilename();
+    if (filename != null) {
+      CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, filename);
+      csvUpdater.deleteColumns(getIdatAndTempIdHeaders());
+    }
+  }
+
+  private void removeIdatAndTempIdHeaders(CsvUpdater csvUpdater) throws CsvUpdaterException {
     csvUpdater.deleteColumns(getIdatAndTempIdHeaders());
   }
 
@@ -203,6 +225,22 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
     csvReaderParameters.setHeaders(getIdatAndTempIdHeaders());
     csvReaderParameters.setFilename(filename);
     return csvReaderParameters;
+  }
+
+  private boolean containsAlreadyIdManagerPseudonymIdType(PathsBundle pathsBundle)
+      throws IOException {
+    String filename = getActiveFilename();
+    if (filename != null) {
+      try (Stream<String> lines = Files.lines(pathsBundle.getPath(filename))) {
+        Optional<String> first = lines.findFirst();
+        return (first.isPresent()) ? first.get().contains(idManagerPseudonymIdType) : false;
+      }
+    }
+    return false;
+  }
+
+  private String getActiveFilename() {
+    return (idatCsvFilename != null) ? idatCsvFilename : localIdCsvFilename;
   }
 
 }

@@ -23,12 +23,15 @@ public class PseudonymisationClient {
 
   private final Logger logger = LoggerFactory.getLogger(PseudonymisationClient.class);
   private WebClient webClient;
+  private Integer idManagerPageSize;
 
 
   public PseudonymisationClient(
       @Value(MtbaConst.ID_MANAGER_API_KEY_SV) String apiKey,
-      @Value(MtbaConst.ID_MANAGER_URL_SV) String idManagerUrl) {
+      @Value(MtbaConst.ID_MANAGER_URL_SV) String idManagerUrl,
+      @Value(MtbaConst.ID_MANAGER_PAGE_SIZE_SV) String idManagerPageSize) {
     this.webClient = createWebClient(apiKey, idManagerUrl);
+    this.idManagerPageSize = Integer.valueOf(idManagerPageSize);
   }
 
   public Map<Integer, String> fetchPatIdPseudonym(Map<Integer, Patient> patIdPatientMap) {
@@ -38,24 +41,42 @@ public class PseudonymisationClient {
     List<Patient> patients = new ArrayList<>();
     patIds.forEach(patId -> patients.add(patIdPatientMap.get(patId)));
 
-    // TODO: Paging
+    int index = 0;
+    int counter = 1;
+    int numberOfPages = getNumberOfPages(patients.size());
+    while (index < patIds.size()){
+      logger.info("Sending request to ID-Manager (Page "+ counter + "/"+numberOfPages+")...");
+      sendRequestAndFetchPseudonyms(index, patients, patIds, patIdPseudonymMap);
+      index += idManagerPageSize;
+      counter ++;
+    }
+
+    return patIdPseudonymMap;
+  }
+
+  private void sendRequestAndFetchPseudonyms(int index, List<Patient> patients,
+      List<Integer> patIds, Map<Integer, String> patIdPseudonymMap) {
     ResponseEntity<IdManagerResponse[]> responseEntity = webClient.post()
         .uri(MtbaConst.ID_MANAGER_GET_IDS_PATH)
-        .bodyValue(createBody(patients))
+        .bodyValue(createBody(patients, index))
         .retrieve()
         .toEntity(IdManagerResponse[].class)
         .block();
     if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-      fetchPseudonyms(responseEntity.getBody(), patIdPseudonymMap, patIds);
+      fetchPseudonyms(index, responseEntity.getBody(), patIdPseudonymMap, patIds);
     } else {
       // TODO: Handle Http Errors
     }
-    return patIdPseudonymMap;
   }
 
-  private void fetchPseudonyms(IdManagerResponse[] idManagerResponseArray,
+  private int getNumberOfPages(int numberOfPatients){
+    return (numberOfPatients == 0) ? 0 :
+        Double.valueOf(1.0 * (numberOfPatients - 1) / idManagerPageSize).intValue() + 1;
+  }
+
+  private void fetchPseudonyms(int index, IdManagerResponse[] idManagerResponseArray,
       Map<Integer, String> patIdPseudonymMap, List<Integer> patIds) {
-    AtomicInteger counter = new AtomicInteger(0);
+    AtomicInteger counter = new AtomicInteger(index);
     Arrays.stream(idManagerResponseArray).forEach(idManagerResponse ->
         patIdPseudonymMap.put(patIds.get(counter.getAndIncrement()),
             fetchPseudonym(idManagerResponse)));
@@ -65,9 +86,13 @@ public class PseudonymisationClient {
     return idManagerResponse.ids().get(0).idString();
   }
 
-  private String createBody(List<Patient> patients) {
+  private String createBody(List<Patient> patients, int index) {
     try {
-      String body = new ObjectMapper().writeValueAsString(patients);
+      List<Patient> tempPatients = new ArrayList<>();
+      for (int i = index; i < patients.size() && i < index + idManagerPageSize; i++) {
+        tempPatients.add(patients.get(i));
+      }
+      String body = new ObjectMapper().writeValueAsString(tempPatients);
       logger.debug(body);
       return body;
     } catch (JsonProcessingException e) {
