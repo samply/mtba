@@ -7,6 +7,7 @@ public class MtbaConst {
   public final static String ID_MANAGER_API_KEY_HEADER = "apiKey";
 
   // Environment Variables
+  public final static String CSV_REMOVE_IDAT = "CSV_REMOVE_IDAT";
   public final static String ID_MANAGER_API_KEY = "ID_MANAGER_API_KEY";
   public final static String ID_MANAGER_URL = "ID_MANAGER_URL";
   public final static String ID_MANAGER_PSEUDONYM_ID_TYPE = "ID_MANAGER_PSEUDONYM_ID_TYPE";
@@ -47,6 +48,7 @@ public class MtbaConst {
   public final static String FHIR_BUNDLE_CSV_FILENAME_SV = HEAD_SV + FHIR_BUNDLE_CSV_FILENAME + ":#{'data_mutations_extended.txt'}" + BOTTOM_SV;
 
   public final static String ID_MANAGER_PAGE_SIZE_SV = HEAD_SV + ID_MANAGER_PAGE_SIZE + ":#{'10'}" + BOTTOM_SV;
+  public final static String CSV_REMOVE_IDAT_SV = HEAD_SV + CSV_REMOVE_IDAT + ":#{'true'}" + BOTTOM_SV;
 
 
   // Camunda BP Constants

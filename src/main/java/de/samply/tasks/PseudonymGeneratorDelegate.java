@@ -33,7 +33,6 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.python.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +50,7 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
   private final String localIdCsvLocalId;
   private final String idatCsvFilename;
   private final String idManagerPseudonymIdType;
+  private final Boolean removeIdat;
   private final static String IDAT_CSV_TEMP_HEADER = "TEMP_PAT_ID";
   private List<String> idatHeaders = new ArrayList<>();
   private Map<String, BiConsumer<PatientFields, String>> headerPatientFieldsMap = new HashMap<>();
@@ -67,9 +67,11 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
       @Value(MtbaConst.IDAT_CSV_CITIZENSHIP_HEADER_SV) String idatCsvCitizenshipHeader,
       @Value(MtbaConst.IDAT_CSV_GENDER_HEADER_SV) String idatCsvGenderHeader,
       @Value(MtbaConst.ID_MANAGER_PSEUDONYM_ID_TYPE_SV) String idManagerPseudonymIdType,
+      @Value(MtbaConst.CSV_REMOVE_IDAT_SV) String removeIdat,
       @Autowired PseudonymisationClient pseudonymisationClient) {
 
     this.pseudonymisationClient = pseudonymisationClient;
+    this.removeIdat = Boolean.valueOf(removeIdat);
     this.localIdCsvFilename = localIdCsvFilename;
     this.localIdCsvLocalId = localIdCsvLocalId;
     this.idatCsvFilename = idatCsvFilename;
@@ -136,12 +138,14 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
     String filename = getActiveFilename();
     if (filename != null) {
       CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, filename);
-      csvUpdater.deleteColumns(getIdatAndTempIdHeaders());
+      removeIdatAndTempIdHeaders(csvUpdater);
     }
   }
 
   private void removeIdatAndTempIdHeaders(CsvUpdater csvUpdater) throws CsvUpdaterException {
-    csvUpdater.deleteColumns(getIdatAndTempIdHeaders());
+    Set<String> columnsToDelete = (removeIdat) ? getIdatAndTempIdHeaders()
+        : new HashSet<>(Arrays.asList(IDAT_CSV_TEMP_HEADER));
+    csvUpdater.deleteColumns(columnsToDelete);
   }
 
   private Set<String> getIdatAndTempIdHeaders() {

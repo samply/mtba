@@ -25,3 +25,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Bugfix: CsvReader
 - Generate Pseudonyms
 - ID-Manager Paging
+- Remove IDAT configurable
