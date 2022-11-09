@@ -47,16 +47,14 @@ public class PathsBundle {
   private void addPathWithoutManagementException(Path path) throws IOException {
 
     if (path != null) {
-      if (directory != null && path.getParent() == null){
+      if (directory != null && path.getParent() == null) {
         path = directory.resolve(Paths.get(path.getFileName().toString()));
       }
-      if (Files.exists(path)){
-        if (Files.isDirectory(path)){
-          Files.list(path).forEach(tempPath -> addPath(tempPath));
-        } else {
-          pathMap.put(path.getFileName().toString(), path);
-          setDirectory(path);
-        }
+      if (Files.isDirectory(path)) {
+        Files.list(path).forEach(tempPath -> addPath(tempPath));
+      } else {
+        pathMap.put(path.getFileName().toString(), path);
+        setDirectory(path);
       }
     }
 
@@ -64,13 +62,19 @@ public class PathsBundle {
 
   /**
    * Set directory of paths bundle.
+   *
    * @param path Directory of paths bundle.
    */
   public void setDirectory(Path path) {
     if (path != null && Files.exists(path.getParent())) {
-      if (directory == null || !directory.equals(path.getParent()) && directory.startsWith(path.getParent())){
+      if (directory == null || !directory.equals(path.getParent()) && directory.startsWith(
+          path.getParent())) {
         directory = path.getParent();
-        pathMap.values().forEach(tempPath -> {if (tempPath.getParent() == null) {pathMap.put(tempPath.getFileName().toString(), directory.resolve(tempPath));}});
+        pathMap.values().forEach(tempPath -> {
+          if (tempPath.getParent() == null) {
+            pathMap.put(tempPath.getFileName().toString(), directory.resolve(tempPath));
+          }
+        });
       }
     }
   }
@@ -147,11 +151,11 @@ public class PathsBundle {
 
   }
 
-  public boolean isPathBundleEmpty(){
+  public boolean isPathBundleEmpty() {
     return pathMap.isEmpty();
   }
 
-  public PathsBundle clone(){
+  public PathsBundle clone() {
     PathsBundle pathsBundle = new PathsBundle();
 
     pathsBundle.setDirectory(this.directory);

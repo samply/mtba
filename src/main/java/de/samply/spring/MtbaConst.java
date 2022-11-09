@@ -2,6 +2,16 @@ package de.samply.spring;
 
 public class MtbaConst {
 
+  // cBioPortal Constands
+  public final static String CBIOPORTAL_API_ROOT_PATH = "/api";
+
+  // FHIR Converter Constants
+  public final static String SOURCE_GENDER_DELIMITER = ",";
+  public final static String MTBA_TRANSFORMER_SCRIPT_FILENAME = "mtba_transformer.py";
+
+  // Blaze Store Constants
+  public final static String BLAZE_STORE_API_PATH = "/fhir";
+
   // ID Manager Constants
   public final static String ID_MANAGER_GET_IDS_PATH = "/paths/translator/getIds";
   public final static String ID_MANAGER_API_KEY_HEADER = "apiKey";
@@ -40,6 +50,8 @@ public class MtbaConst {
   public final static String SAMPLE_CSV_FILENAME = "SAMPLE_CSV_FILENAME";
   public final static String SAMPLE_CSV_SAMPLE_ID_HEADER = "SAMPLE_CSV_SAMPLE_ID_HEADER";
   public final static String SAMPLE_CSV_PATIENT_ID_HEADER = "SAMPLE_CSV_PATIENT_ID_HEADER";
+  public final static String BLAZE_STORE_URL = "BLAZE_STORE_URL";
+  public final static String CBIOPORTAL_URL = "CBIOPORTAL_URL";
 
   // Spring Values (SV)
   public final static String HEAD_SV = "${";
@@ -77,14 +89,11 @@ public class MtbaConst {
   public final static String SAMPLE_CSV_FILENAME_SV = HEAD_SV + SAMPLE_CSV_FILENAME + ":#{'data_clinical_sample.txt'}" + BOTTOM_SV;
   public final static String SAMPLE_CSV_SAMPLE_ID_HEADER_SV = HEAD_SV + SAMPLE_CSV_SAMPLE_ID_HEADER + ":#{'SAMPLE_ID'}" + BOTTOM_SV;
   public final static String SAMPLE_CSV_PATIENT_ID_HEADER_SV = HEAD_SV + SAMPLE_CSV_PATIENT_ID_HEADER + ":#{'PATIENT_ID'}" + BOTTOM_SV;
-
+  public final static String BLAZE_STORE_URL_SV = HEAD_SV + BLAZE_STORE_URL + ":#{null}" + BOTTOM_SV;
+  public final static String CBIOPORTAL_URL_SV = HEAD_SV + CBIOPORTAL_URL + ":#{null}" + BOTTOM_SV;
 
   // Camunda BP Constants
   public final static String PATHS_BUNDLE = "pathsBundle";
   public final static String IS_PATHS_BUNDLE_EMPTY = "isPathsBundleEmpty";
-
-  // Other
-  public final static String SOURCE_GENDER_DELIMITER = ",";
-  public final static String MTBA_TRANSFORMER_SCRIPT_FILENAME = "mtba_transformer.py";
 
 }

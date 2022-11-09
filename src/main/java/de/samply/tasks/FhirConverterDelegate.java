@@ -17,8 +17,15 @@ import de.samply.file.csv.updater.PivotedCsvRecordHeaderValues;
 import de.samply.spring.MtbaConst;
 import de.samply.utils.PathsBundleUtils;
 import de.samply.utils.TemporalDirectoryManager;
+import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,6 +77,7 @@ public class FhirConverterDelegate implements JavaDelegate {
     this.sampleFilename = sampleFilename;
     this.sampleFileSampleIdHeader = sampleFileSamplyIdHeader;
     this.sampleFilePatientIdHeader = sampleFilePatientIdHeader;
+
   }
 
   @Override
@@ -83,7 +91,8 @@ public class FhirConverterDelegate implements JavaDelegate {
     // Add pseudonym
     addPseudonymToDataMutationFile(pathsBundle);
     // Execute script
-    PathsBundle outputPathsBundle = executeScriptAndGetResults(pathsBundle.getPath(dataMutationFile));
+    PathsBundle outputPathsBundle = executeScriptAndGetResults(
+        pathsBundle.getPath(dataMutationFile));
     PathsBundleUtils.addPathsBundleAsVariable(delegateExecution, outputPathsBundle);
   }
 
@@ -162,16 +171,30 @@ public class FhirConverterDelegate implements JavaDelegate {
       throws IOException, InterruptedException {
     String outputFilename = createOutputFilename(path);
     PathsBundle outputPathsBundle = createOutputPathsBundle(outputFilename);
-    ProcessBuilder processBuilder = new ProcessBuilder(scriptInterpreter, getScript(),
+    Path scriptPath = copyScriptToTemporalPath();
+    ProcessBuilder processBuilder = new ProcessBuilder(scriptInterpreter,
+        scriptPath.toAbsolutePath().toString(),
         path.toAbsolutePath().toString(),
         outputPathsBundle.getPath(outputFilename).toAbsolutePath().toString());
     Process process = processBuilder.start();
+    logProcess(process);
     int statusCode = process.waitFor();
+    deleteScriptPath(scriptPath);
     if (statusCode == 0) {
       return outputPathsBundle;
     } else {
       //TODO
       return new PathsBundle();
+    }
+  }
+
+  private void logProcess(Process process) throws IOException {
+    try (var reader = new BufferedReader(
+        new InputStreamReader(process.getInputStream()))) {
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        logger.debug(line);
+      }
     }
   }
 
@@ -191,7 +214,38 @@ public class FhirConverterDelegate implements JavaDelegate {
 
   private String getScript() {
     return getClass().getClassLoader().getResource(MtbaConst.MTBA_TRANSFORMER_SCRIPT_FILENAME)
-        .toString();
+        .getPath().substring(1);
+  }
+
+  private Path copyScriptToTemporalPath() throws IOException {
+    try (InputStream inputStream = getClass().getClassLoader()
+        .getResourceAsStream(MtbaConst.MTBA_TRANSFORMER_SCRIPT_FILENAME);
+        InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(streamReader)) {
+      return copyScriptToTemporalPath(reader);
+    }
+  }
+
+  private Path copyScriptToTemporalPath(BufferedReader reader) throws IOException {
+    Path temporalDirectory = temporalDirectoryManager.createTemporalDirectory();
+    Path scriptPath = temporalDirectory.resolve(MtbaConst.MTBA_TRANSFORMER_SCRIPT_FILENAME);
+    writeTemporalPath(reader, scriptPath);
+    return scriptPath;
+  }
+
+  private void writeTemporalPath(BufferedReader reader, Path scriptPath) throws IOException {
+    try (FileWriter fileWriter = new FileWriter(scriptPath.toFile())) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        fileWriter.write(line);
+        fileWriter.write('\n');
+      }
+    }
+  }
+
+  private void deleteScriptPath(Path scriptPath) throws IOException {
+    Files.delete(scriptPath);
+    Files.delete(scriptPath.getParent());
   }
 
 }

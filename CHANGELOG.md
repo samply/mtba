@@ -29,3 +29,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Gender converter and birthday converter
 - Add Pseudonym to data mutations
 - Pass fhir results of python script to blaze exporter
+- Blaze Store Exporter
