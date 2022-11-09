@@ -13,8 +13,6 @@ import de.samply.file.csv.updater.CsvUpdaterException;
 import de.samply.file.csv.updater.CsvUpdaterFactory;
 import de.samply.file.csv.updater.CsvUpdaterFactoryException;
 import de.samply.file.csv.updater.CsvUpdaterFactoryImpl;
-import de.samply.file.csv.updater.CsvUpdaterImpl;
-import de.samply.file.csv.updater.CsvUpdaterParameters;
 import de.samply.file.csv.updater.PivotedCsvRecordHeaderValues;
 import de.samply.spring.MtbaConst;
 import de.samply.utils.PathsBundleUtils;
@@ -82,10 +80,11 @@ public class FhirConverterDelegate implements JavaDelegate {
     PathsBundleManager pathsBundleManager = new PathsBundleManagerImpl(pathsBundle.getDirectory());
     pathsBundle = pathsBundleManager.copyPathsBundleToOutputFolder(pathsBundle,
         temporalDirectoryManager.createTemporalDirectory());
-
+    // Add pseudonym
     addPseudonymToDataMutationFile(pathsBundle);
-    executeScript(pathsBundle.getPath(dataMutationFile));
-    //TODO
+    // Execute script
+    PathsBundle outputPathsBundle = executeScriptAndGetResults(pathsBundle.getPath(dataMutationFile));
+    PathsBundleUtils.addPathsBundleAsVariable(delegateExecution, outputPathsBundle);
   }
 
   private void addPseudonymToDataMutationFile(PathsBundle pathsBundle)
@@ -159,13 +158,35 @@ public class FhirConverterDelegate implements JavaDelegate {
   }
 
 
-  private void executeScript(Path path) throws IOException, InterruptedException {
+  private PathsBundle executeScriptAndGetResults(Path path)
+      throws IOException, InterruptedException {
+    String outputFilename = createOutputFilename(path);
+    PathsBundle outputPathsBundle = createOutputPathsBundle(outputFilename);
     ProcessBuilder processBuilder = new ProcessBuilder(scriptInterpreter, getScript(),
-        path.toAbsolutePath().toString());
+        path.toAbsolutePath().toString(),
+        outputPathsBundle.getPath(outputFilename).toAbsolutePath().toString());
     Process process = processBuilder.start();
     int statusCode = process.waitFor();
-    //TODO
-    System.out.println();
+    if (statusCode == 0) {
+      return outputPathsBundle;
+    } else {
+      //TODO
+      return new PathsBundle();
+    }
+  }
+
+  PathsBundle createOutputPathsBundle(String outputFilename) {
+    Path temporalDirectory = temporalDirectoryManager.createTemporalDirectory();
+    Path outputPath = temporalDirectory.resolve(outputFilename);
+    PathsBundle pathsBundle = new PathsBundle();
+    pathsBundle.addPath(outputPath);
+
+    return pathsBundle;
+  }
+
+  private String createOutputFilename(Path inputPath) {
+    String inputFilename = inputPath.getFileName().toString();
+    return inputFilename.substring(0, inputFilename.lastIndexOf('.') + 1) + "xml";
   }
 
   private String getScript() {
