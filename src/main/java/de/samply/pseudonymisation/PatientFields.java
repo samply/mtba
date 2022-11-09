@@ -1,6 +1,5 @@
 package de.samply.pseudonymisation;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +13,6 @@ public class PatientFields {
   String lastName;
   @JsonProperty("Fruehere_Namen")
   String previousNames;
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
   @JsonProperty("Geburtsdatum")
   String birthdate;
   @JsonProperty("Staatsangehoerigkeit")

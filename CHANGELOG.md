@@ -26,3 +26,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Generate Pseudonyms
 - ID-Manager Paging
 - Remove IDAT configurable
+- Gender converter and birthday converter
