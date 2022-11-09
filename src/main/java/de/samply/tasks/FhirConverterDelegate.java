@@ -140,15 +140,19 @@ public class FhirConverterDelegate implements JavaDelegate {
       throws CsvUpdaterFactoryException, CsvUpdaterException {
     CsvUpdater csvUpdater = csvUpdaterFactory.createCsvUpdater(
         new CsvReaderParameters(dataMutationFile, pathsBundle));
-    csvUpdater.addPivotedCsvRecordHeaderValues(createPivotedCsvRecordHeaderValuesToAddPseudonymToDataMutationFile(sampleIdPseudonymMap));
+    csvUpdater.addPivotedCsvRecordHeaderValues(
+        createPivotedCsvRecordHeaderValuesToAddPseudonymToDataMutationFile(sampleIdPseudonymMap));
   }
 
-  private PivotedCsvRecordHeaderValues createPivotedCsvRecordHeaderValuesToAddPseudonymToDataMutationFile(Map<String, String> sampleIdPseudonymMap){
-    PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues = new PivotedCsvRecordHeaderValues(dataMutationFileSampleIdHeader);
+  private PivotedCsvRecordHeaderValues createPivotedCsvRecordHeaderValuesToAddPseudonymToDataMutationFile(
+      Map<String, String> sampleIdPseudonymMap) {
+    PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues = new PivotedCsvRecordHeaderValues(
+        dataMutationFileSampleIdHeader);
     sampleIdPseudonymMap.keySet().forEach(sampleId -> {
       CsvRecordHeaderValues csvRecordHeaderValues = new CsvRecordHeaderValues();
       csvRecordHeaderValues.getHeaderValueMap().put(dataMutationFileSampleIdHeader, sampleId);
-      csvRecordHeaderValues.getHeaderValueMap().put(idManagerPseudonymIdType, sampleIdPseudonymMap.get(sampleId));
+      csvRecordHeaderValues.getHeaderValueMap()
+          .put(idManagerPseudonymIdType, sampleIdPseudonymMap.get(sampleId));
       pivotedCsvRecordHeaderValues.addCsvRecordHeaderValues(csvRecordHeaderValues);
     });
     return pivotedCsvRecordHeaderValues;
@@ -156,12 +160,17 @@ public class FhirConverterDelegate implements JavaDelegate {
 
 
   private void executeScript(Path path) throws IOException, InterruptedException {
-    ProcessBuilder processBuilder = new ProcessBuilder(scriptInterpreter,
+    ProcessBuilder processBuilder = new ProcessBuilder(scriptInterpreter, getScript(),
         path.toAbsolutePath().toString());
     Process process = processBuilder.start();
     int statusCode = process.waitFor();
     //TODO
     System.out.println();
+  }
+
+  private String getScript() {
+    return getClass().getClassLoader().getResource(MtbaConst.MTBA_TRANSFORMER_SCRIPT_FILENAME)
+        .toString();
   }
 
 }

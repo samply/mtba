@@ -85,5 +85,6 @@ public class MtbaConst {
 
   // Other
   public final static String SOURCE_GENDER_DELIMITER = ",";
+  public final static String MTBA_TRANSFORMER_SCRIPT_FILENAME = "mtba_transformer.py";
 
 }

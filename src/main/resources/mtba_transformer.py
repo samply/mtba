@@ -2,7 +2,7 @@ from xml.etree import ElementTree as ET
 import csv
 import re
 
-filename = '/mtba-files/input/data_mutations_extended.txt'
+filename = 'C:/projects/mtba/mtba-files/temp/tempDir15846579076490716024/data_mutations_extended.txt'
 
 def convert_row(headers, row):
     columns=re.split(r'\t+', row[0])
@@ -43,6 +43,5 @@ with open(filename, 'r') as f:
     print(xml)
     
     tree = ET.XML(xml)
-    with open("C:/Workspace/github/mtba/mtba-files/temp/result.xml", "w") as f:
+    with open("C:/projects/mtba/mtba-files/temp/tempDir15846579076490716024/result.xml", "w") as f:
         f.write(xml)
-
