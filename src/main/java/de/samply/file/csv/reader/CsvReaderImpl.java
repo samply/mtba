@@ -1,5 +1,6 @@
 package de.samply.file.csv.reader;
 
+import de.samply.file.bundle.PathsBundle;
 import de.samply.file.csv.CsvRecordHeaderValues;
 import de.samply.file.csv.CsvRecordHeaderValuesIterator;
 import de.samply.utils.Constants;
@@ -22,6 +23,11 @@ public class CsvReaderImpl implements CsvReader {
   private final Reader reader;
   private final CsvReaderParameters csvReaderParameters;
   private String delimiter = Constants.DEFAULT_DELIMITER;
+
+
+  public CsvReaderImpl(String filename, PathsBundle pathsBundle) throws CsvReaderException {
+    this(new CsvReaderParameters(filename, pathsBundle));
+  }
 
   public CsvReaderImpl(CsvReaderParameters csvReaderParameters) throws CsvReaderException {
     this.csvReaderParameters = csvReaderParameters;

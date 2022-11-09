@@ -49,24 +49,24 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
   private PseudonymisationClient pseudonymisationClient;
   private PatientFieldsUtils patientFieldsUtils;
   private final CsvUpdaterFactory csvUpdaterFactory = new CsvUpdaterFactoryImpl();
-  private final String identityCsvLocalId;
-  private final String identityCsvFilename;
+  private final String patientCsvLocalId;
+  private final String patientCsvFilename;
   private final String idManagerPseudonymIdType;
   private final Boolean removeIdat;
-  private final static String IDENTITY_CSV_TEMP_HEADER = "TEMP_PAT_ID";
+  private final static String PATIENT_CSV_TEMP_HEADER = "TEMP_PAT_ID";
   private List<String> idatHeaders = new ArrayList<>();
   private Map<String, BiConsumer<PatientFields, String>> headerPatientFieldsMap = new HashMap<>();
 
 
   public PseudonymGeneratorDelegate(
-      @Value(MtbaConst.IDENTITY_CSV_LOCAL_ID_HEADER_SV) String identityCsvLocalId,
-      @Value(MtbaConst.IDENTITY_CSV_FILENAME_SV) String identityCsvFilename,
-      @Value(MtbaConst.IDENTITY_CSV_FIRST_NAME_HEADER_SV) String identityCsvFirstNameHeader,
-      @Value(MtbaConst.IDENTITY_CSV_LAST_NAME_HEADER_SV) String identityCsvLastNameHeader,
-      @Value(MtbaConst.IDENTITY_CSV_PREVIOUS_NAMES_HEADER_SV) String identityCsvPreviousNamesHeader,
-      @Value(MtbaConst.IDENTITY_CSV_BIRTHDAY_HEADER_SV) String identityCsvBirthdayHeader,
-      @Value(MtbaConst.IDENTITY_CSV_CITIZENSHIP_HEADER_SV) String identityCsvCitizenshipHeader,
-      @Value(MtbaConst.IDENTITY_CSV_GENDER_HEADER_SV) String identityCsvGenderHeader,
+      @Value(MtbaConst.PATIENT_CSV_LOCAL_ID_HEADER_SV) String patientCsvLocalId,
+      @Value(MtbaConst.PATIENT_CSV_FILENAME_SV) String patientCsvFilename,
+      @Value(MtbaConst.PATIENT_CSV_FIRST_NAME_HEADER_SV) String patientCsvFirstNameHeader,
+      @Value(MtbaConst.PATIENT_CSV_LAST_NAME_HEADER_SV) String patientCsvLastNameHeader,
+      @Value(MtbaConst.PATIENT_CSV_PREVIOUS_NAMES_HEADER_SV) String patientCsvPreviousNamesHeader,
+      @Value(MtbaConst.PATIENT_CSV_BIRTHDAY_HEADER_SV) String patientCsvBirthdayHeader,
+      @Value(MtbaConst.PATIENT_CSV_CITIZENSHIP_HEADER_SV) String patientCsvCitizenshipHeader,
+      @Value(MtbaConst.PATIENT_CSV_GENDER_HEADER_SV) String patientCsvGenderHeader,
       @Value(MtbaConst.ID_MANAGER_PSEUDONYM_ID_TYPE_SV) String idManagerPseudonymIdType,
       @Value(MtbaConst.CSV_REMOVE_IDAT_SV) String removeIdat,
       @Autowired PseudonymisationClient pseudonymisationClient,
@@ -75,26 +75,26 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
     this.pseudonymisationClient = pseudonymisationClient;
     this.patientFieldsUtils = patientFieldsUtils;
     this.removeIdat = Boolean.valueOf(removeIdat);
-    this.identityCsvLocalId = identityCsvLocalId;
-    this.identityCsvFilename = identityCsvFilename;
+    this.patientCsvLocalId = patientCsvLocalId;
+    this.patientCsvFilename = patientCsvFilename;
     this.idManagerPseudonymIdType = idManagerPseudonymIdType;
 
-    String[] tempIdatHeaders = {identityCsvFirstNameHeader, identityCsvLastNameHeader,
-        identityCsvPreviousNamesHeader, identityCsvBirthdayHeader, identityCsvCitizenshipHeader,
-        identityCsvGenderHeader};
+    String[] tempIdatHeaders = {patientCsvFirstNameHeader, patientCsvLastNameHeader,
+        patientCsvPreviousNamesHeader, patientCsvBirthdayHeader, patientCsvCitizenshipHeader,
+        patientCsvGenderHeader};
     Arrays.stream(tempIdatHeaders).forEach(header -> {
       if (header != null) {
         this.idatHeaders.add(header);
       }
     });
 
-    headerPatientFieldsMap.put(identityCsvFirstNameHeader, PatientFields::setFirstName);
-    headerPatientFieldsMap.put(identityCsvLastNameHeader, PatientFields::setLastName);
-    headerPatientFieldsMap.put(identityCsvPreviousNamesHeader, PatientFields::setPreviousNames);
-    headerPatientFieldsMap.put(identityCsvBirthdayHeader, (patientField, value) ->
+    headerPatientFieldsMap.put(patientCsvFirstNameHeader, PatientFields::setFirstName);
+    headerPatientFieldsMap.put(patientCsvLastNameHeader, PatientFields::setLastName);
+    headerPatientFieldsMap.put(patientCsvPreviousNamesHeader, PatientFields::setPreviousNames);
+    headerPatientFieldsMap.put(patientCsvBirthdayHeader, (patientField, value) ->
         patientField.setBirthdate(patientFieldsUtils.convertBirthdayToIdManager(value)));
-    headerPatientFieldsMap.put(identityCsvCitizenshipHeader, PatientFields::setCitizenship);
-    headerPatientFieldsMap.put(identityCsvGenderHeader, (patientField, value) ->
+    headerPatientFieldsMap.put(patientCsvCitizenshipHeader, PatientFields::setCitizenship);
+    headerPatientFieldsMap.put(patientCsvGenderHeader, (patientField, value) ->
         patientField.setGender(patientFieldsUtils.covertGenderToIdManager(value)));
   }
 
@@ -104,7 +104,7 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
     PathsBundle pathsBundle = PathsBundleUtils.getPathsBundleVariable(delegateExecution);
     if (containsAlreadyIdManagerPseudonymIdType(pathsBundle)) { // Already pseudonymized
       removeIdatAndTempIdHeaders(pathsBundle);
-    } else if (identityCsvLocalId != null) { // Local Id
+    } else if (patientCsvLocalId != null) { // Local Id
       fetchPseudonymsFromLocalId(pathsBundle);
     } else { //IDAT
       fetchPseudonymsFromIdat(pathsBundle);
@@ -113,18 +113,18 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
 
   private void fetchPseudonymsFromLocalId(PathsBundle pathsBundle)
       throws CsvUpdaterFactoryException {
-    CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, identityCsvFilename);
+    CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, patientCsvFilename);
     //TODO
   }
 
   private void fetchPseudonymsFromIdat(PathsBundle pathsBundle)
       throws CsvUpdaterFactoryException, CsvUpdaterException, CsvReaderException, IOException {
-    CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, identityCsvFilename);
+    CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, patientCsvFilename);
     // Add temporal id as column. This works as pivot.
     csvUpdater.applyConsumer(new TempIdCsvRecordHeaderValuesConsumer());
     // Read IDAT and pseudonomyze.
     Map<Integer, String> patIdPseudonymMap = pseudonymisationClient.fetchPatIdPseudonym(
-        readIdat(pathsBundle, identityCsvFilename));
+        readIdat(pathsBundle, patientCsvFilename));
     // Add Pseudonyms to file.
     csvUpdater.addPivotedCsvRecordHeaderValues(
         createPivotedCsvRecordHeaderValues(patIdPseudonymMap));
@@ -135,24 +135,24 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
   private CsvUpdater createCsvUpdater(PathsBundle pathsBundle, String filename)
       throws CsvUpdaterFactoryException {
     return csvUpdaterFactory.createCsvUpdater(
-        createCsvReaderParametersForUpdater(pathsBundle, identityCsvFilename));
+        new CsvReaderParameters(patientCsvFilename, pathsBundle));
   }
 
   private void removeIdatAndTempIdHeaders(PathsBundle pathsBundle)
       throws CsvUpdaterException, CsvUpdaterFactoryException {
-    CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, identityCsvFilename);
+    CsvUpdater csvUpdater = createCsvUpdater(pathsBundle, patientCsvFilename);
     removeIdatAndTempIdHeaders(csvUpdater);
   }
 
   private void removeIdatAndTempIdHeaders(CsvUpdater csvUpdater) throws CsvUpdaterException {
     Set<String> columnsToDelete = (removeIdat) ? getIdatAndTempIdHeaders()
-        : new HashSet<>(Arrays.asList(IDENTITY_CSV_TEMP_HEADER));
+        : new HashSet<>(Arrays.asList(PATIENT_CSV_TEMP_HEADER));
     csvUpdater.deleteColumns(columnsToDelete);
   }
 
   private Set<String> getIdatAndTempIdHeaders() {
     List<String> headers = new ArrayList<>();
-    headers.add(IDENTITY_CSV_TEMP_HEADER);
+    headers.add(PATIENT_CSV_TEMP_HEADER);
     headers.addAll(idatHeaders);
     return new HashSet<>(headers);
   }
@@ -160,11 +160,11 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
   private PivotedCsvRecordHeaderValues createPivotedCsvRecordHeaderValues(
       Map<Integer, String> patIdPseudonymMap) {
     PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues = new PivotedCsvRecordHeaderValues(
-        IDENTITY_CSV_TEMP_HEADER);
+        PATIENT_CSV_TEMP_HEADER);
     patIdPseudonymMap.keySet().forEach(patId -> {
       CsvRecordHeaderValues csvRecordHeaderValues = new CsvRecordHeaderValues();
       Map<String, String> headerValueMap = csvRecordHeaderValues.getHeaderValueMap();
-      headerValueMap.put(IDENTITY_CSV_TEMP_HEADER, patId.toString());
+      headerValueMap.put(PATIENT_CSV_TEMP_HEADER, patId.toString());
       headerValueMap.put(idManagerPseudonymIdType, patIdPseudonymMap.get(patId));
       pivotedCsvRecordHeaderValues.addCsvRecordHeaderValues(csvRecordHeaderValues);
     });
@@ -178,23 +178,15 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
     @Override
     public void accept(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
       csvRecordHeaderValues.getHeaderValueMap()
-          .put(IDENTITY_CSV_TEMP_HEADER, (counter++).toString());
+          .put(PATIENT_CSV_TEMP_HEADER, (counter++).toString());
     }
 
     @Override
     public CsvRecordHeaderOrder prepareHeaders(CsvRecordHeaderOrder csvRecordHeaderOrder)
         throws CsvUpdaterException {
-      csvRecordHeaderOrder.addHeaderAtLastPosition(IDENTITY_CSV_TEMP_HEADER);
+      csvRecordHeaderOrder.addHeaderAtLastPosition(PATIENT_CSV_TEMP_HEADER);
       return csvRecordHeaderOrder;
     }
-  }
-
-  CsvReaderParameters createCsvReaderParametersForUpdater(PathsBundle pathsBundle,
-      String filename) {
-    CsvReaderParameters csvReaderParameters = new CsvReaderParameters();
-    csvReaderParameters.setPathsBundle(pathsBundle);
-    csvReaderParameters.setFilename(filename);
-    return csvReaderParameters;
   }
 
   private Map<Integer, Patient> readIdat(PathsBundle pathsBundle, String filename)
@@ -205,7 +197,7 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
         createCsvReaderParametersToReadIdat(pathsBundle, filename))) {
       csvReader.readCsvRecordHeaderValues().forEach(csvRecordHeaderValues -> {
         Patient patient = createPatient(csvRecordHeaderValues);
-        Integer patId = Integer.valueOf(csvRecordHeaderValues.getValue(IDENTITY_CSV_TEMP_HEADER));
+        Integer patId = Integer.valueOf(csvRecordHeaderValues.getValue(PATIENT_CSV_TEMP_HEADER));
         patIdPatientMap.put(patId, patient);
       });
     }
@@ -236,7 +228,7 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
 
   private boolean containsAlreadyIdManagerPseudonymIdType(PathsBundle pathsBundle)
       throws IOException {
-    Path path = pathsBundle.getPath(identityCsvFilename);
+    Path path = pathsBundle.getPath(patientCsvFilename);
     if (Files.exists(path)) {
       try (Stream<String> lines = Files.lines(path)) {
         Optional<String> first = lines.findFirst();
