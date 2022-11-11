@@ -30,3 +30,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add Pseudonym to data mutations
 - Pass fhir results of python script to blaze exporter
 - Blaze Store Exporter
+- Add Python to Docker
