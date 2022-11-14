@@ -3,3 +3,5 @@
 target/
 tempDir*
 camunda-h2-database.mv.db
+camunda-h2-database.trace.db
+mtba-files

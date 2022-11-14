@@ -18,3 +18,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Tests
 - BPMN (Camunda)
 - Docker
+- Generate Bundle Delegate
+- PathsBundle Serialization
+- Java 17
+- FHIR Converter
+- Bugfix: CsvReader
+- Generate Pseudonyms
+- ID-Manager Paging
+- Remove IDAT configurable
+- Gender converter and birthday converter
+- Add Pseudonym to data mutations
+- Pass fhir results of python script to blaze exporter
+- Blaze Store Exporter
+- Add Python to Docker

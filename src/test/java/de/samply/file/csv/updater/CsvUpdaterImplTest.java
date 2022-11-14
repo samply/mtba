@@ -156,7 +156,7 @@ class CsvUpdaterImplTest {
       int numberOfAdditionalHeaders) {
 
     Set<String> headers = createHeaders(currentNumberOfHeaders, numberOfAdditionalHeaders);
-    CsvRecordHeaderValues csvRecordHeaderValues = new CsvRecordHeaderValues(headers);
+    CsvRecordHeaderValues csvRecordHeaderValues = new CsvRecordHeaderValues();
 
     headers.forEach(header ->
         Arrays.stream(RandomPathGenerator.

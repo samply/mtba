@@ -1,17 +1,15 @@
 package de.samply.file.csv.reader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.samply.file.bundle.PathsBundle;
 import de.samply.file.csv.CsvRecordHeaderValues;
-import de.samply.utils.Constants;
+import de.samply.file.csv.TestUtils;
 import de.samply.utils.RandomPathGenerator;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -37,7 +35,7 @@ class CsvReaderImplTest {
 
   @AfterEach
   void tearDown() throws IOException {
-    FileUtils.deleteDirectory(pathsBundle.getDirectory().toFile());
+    TestUtils.deleteDirectory(pathsBundle);
   }
 
   @Test
@@ -50,30 +48,29 @@ class CsvReaderImplTest {
   void readAllCsvRecordHeaderValues() throws CsvReaderException, IOException {
     CsvReaderParameters csvReaderParameters = createCsvReaderParameters();
     csvReaderParameters.clearHeaders();
-    Set<String> headersToRead = getAllHeaders(csvReaderParameters.getPath());
+    Set<String> headersToRead = TestUtils.getAllHeaders(csvReaderParameters.getPath());
     readCsvRecordHeaderValues(csvReaderParameters, headersToRead);
   }
 
   void readCsvRecordHeaderValues(CsvReaderParameters csvReaderParameters, Set<String> headersToRead)
       throws IOException, CsvReaderException {
 
-    int numberOfLines = getNumberOfLines(csvReaderParameters.getPath());
+    int numberOfLines = TestUtils.getNumberOfLines(csvReaderParameters.getPath());
+    List<Map<String, String>> pathValues = TestUtils.fetchFileValues(csvReaderParameters.getPath());
 
     CsvReader csvReader = new CsvReaderImpl(csvReaderParameters);
     AtomicInteger counter = new AtomicInteger(0);
-    csvReader.readCsvRecordHeaderValues().forEach(csvRecordHeaderValues -> {
-      checkCsvRecordHeaderValues(csvRecordHeaderValues, headersToRead);
-      counter.incrementAndGet();
-    });
+    csvReader.readCsvRecordHeaderValues().forEach(csvRecordHeaderValues ->
+        checkCsvRecordHeaderValues(csvRecordHeaderValues, headersToRead, counter.getAndIncrement(),
+            pathValues));
     assertEquals(numberOfLines, counter.get());
 
   }
 
-  private void checkCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues, Set<String> headersToRead) {
-
-    // TODO: Alternative: Datei manuell lesen und in String[][] konvertieren. Test: Werte vergleichen.
+  private void checkCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues,
+      Set<String> headersToRead, int counter, List<Map<String, String>> pathValues) {
     for (String header : headersToRead) {
-      assertNotNull(csvRecordHeaderValues.getValue(header));
+      assertEquals(pathValues.get(counter).get(header), csvRecordHeaderValues.getValue(header));
     }
     assertEquals(headersToRead.size(), csvRecordHeaderValues.getHeaderValueMap().keySet().size());
   }
@@ -84,38 +81,12 @@ class CsvReaderImplTest {
     csvReaderParameters.setPathsBundle(pathsBundle);
     Path path = pathsBundle.getAllPaths().stream().collect(Collectors.toList()).get(0);
 
-    csvReaderParameters.setHeaders(getRandomHeaders(path));
+    csvReaderParameters.setHeaders(TestUtils.getRandomHeaders(path));
     csvReaderParameters.setFilename(path.getFileName().toString());
 
     return csvReaderParameters;
 
   }
 
-  private Set<String> getRandomHeaders(Path path) throws IOException {
-    HashSet<String> headers = new HashSet<>();
-
-    boolean atLeastOneHeader = false;
-    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
-      if (!atLeastOneHeader || Math.random() < 0.5) {
-        headers.add(header);
-        atLeastOneHeader = true;
-      }
-    }
-
-    return headers;
-
-  }
-
-  private Set<String> getAllHeaders(Path path) throws IOException {
-    HashSet<String> headers = new HashSet<>();
-    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
-        headers.add(header);
-    }
-    return headers;
-  }
-
-  private int getNumberOfLines(Path path) throws IOException {
-    return ((int) Files.readAllLines(path).stream().filter(line -> line.length() > 0).count()) - 1;
-  }
 
 }

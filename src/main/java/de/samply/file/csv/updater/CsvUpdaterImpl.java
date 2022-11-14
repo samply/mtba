@@ -69,18 +69,15 @@ public class CsvUpdaterImpl implements CsvUpdater {
     }
 
     @Override
-    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
-        throws CsvUpdaterException {
+    public void accept(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
       try {
-        addCsvRecordHeaderValues(csvWriter, csvRecordHeaderValues,
-            pivotedCsvRecordHeaderValues);
+        addCsvRecordHeaderValues(csvRecordHeaderValues, pivotedCsvRecordHeaderValues);
       } catch (CsvWriterException e) {
         throw new CsvUpdaterException(e);
       }
     }
 
-    private void addCsvRecordHeaderValues(CsvWriter csvWriter,
-        CsvRecordHeaderValues csvRecordHeaderValues,
+    private void addCsvRecordHeaderValues(CsvRecordHeaderValues csvRecordHeaderValues,
         PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues) throws CsvWriterException {
 
       String pivotHeader = pivotedCsvRecordHeaderValues.getPivotHeader();
@@ -88,8 +85,6 @@ public class CsvUpdaterImpl implements CsvUpdater {
       CsvRecordHeaderValues newCsvRecordHeaderValues =
           pivotedCsvRecordHeaderValues.getCsvRecordHeaderValues(pivotValue);
       csvRecordHeaderValues.merge(newCsvRecordHeaderValues);
-
-      csvWriter.writeCsvRecord(csvRecordHeaderValues);
 
     }
 
@@ -162,7 +157,10 @@ public class CsvUpdaterImpl implements CsvUpdater {
     csvReader
         .readCsvRecordHeaderValues()
         .map(EitherUtils.liftConsumer(
-            csvRecordHeaderValues -> consumer.accept(csvWriter, csvRecordHeaderValues)))
+            csvRecordHeaderValues -> {
+              consumer.accept(csvRecordHeaderValues);
+              csvWriter.writeCsvRecord(csvRecordHeaderValues);
+            }))
         .filter(Objects::nonNull)
         .forEach(either -> logger
             .error("Exception while applying consumer to file", (Exception) either.getLeft()));
@@ -209,10 +207,8 @@ public class CsvUpdaterImpl implements CsvUpdater {
     }
 
     @Override
-    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
-        throws CsvUpdaterException {
+    public void accept(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
       filterHeadersInCsvRecordHeaderValues(csvRecordHeaderValues);
-      super.accept(csvWriter, csvRecordHeaderValues);
     }
 
     @Override
@@ -259,10 +255,8 @@ public class CsvUpdaterImpl implements CsvUpdater {
     }
 
     @Override
-    public void accept(CsvWriter csvWriter, CsvRecordHeaderValues csvRecordHeaderValues)
-        throws CsvUpdaterException {
+    public void accept(CsvRecordHeaderValues csvRecordHeaderValues) throws CsvUpdaterException {
       renameCsvRecordHeaderValues(csvRecordHeaderValues);
-      super.accept(csvWriter, csvRecordHeaderValues);
     }
 
     @Override
