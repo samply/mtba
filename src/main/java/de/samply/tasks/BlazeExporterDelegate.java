@@ -51,7 +51,7 @@ public class BlazeExporterDelegate implements JavaDelegate {
         .block();
     if (blazeResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
       Arrays.stream(blazeResponseEntity.getBody().getEntry()).forEach(response -> {
-        if (response.response().getStatus().startsWith("20")) {
+        if (response.getResponse().getStatus().startsWith("20")) {
           //TODO
         } else {
           //TODO

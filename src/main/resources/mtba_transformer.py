@@ -15,7 +15,7 @@ def convert_row(headers, row):
     #specimen_id="TODO"
     #time_id="TODO"
     mutation_dktk="M"
-    mutation_mtba=f"{columns[0]}"
+    mutation_mtba=f"{columns[-2]}"
     identifier=sha256(''.join(columns).encode('utf-8')).hexdigest()[0:15]
     entry = '<entry>\n' + f'<fullUrl value="http://example.com/Observation/{identifier}" /><resource><Observation xmlns="http://hl7.org/fhir">'
     resource= (f'<id value="{identifier}" />' +

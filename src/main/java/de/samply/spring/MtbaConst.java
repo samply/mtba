@@ -11,6 +11,7 @@ public class MtbaConst {
 
   // Blaze Store Constants
   public final static String BLAZE_STORE_API_PATH = "/fhir";
+  public final static String BLAZE_STORE_GET_PATIENT_THROUGH_PSEUDONYM_PATH = "/Patient?identifier=";
 
   // ID Manager Constants
   public final static String ID_MANAGER_GET_IDS_PATH = "/paths/translator/getIds";
@@ -51,6 +52,7 @@ public class MtbaConst {
   public final static String SAMPLE_CSV_SAMPLE_ID_HEADER = "SAMPLE_CSV_SAMPLE_ID_HEADER";
   public final static String SAMPLE_CSV_PATIENT_ID_HEADER = "SAMPLE_CSV_PATIENT_ID_HEADER";
   public final static String BLAZE_STORE_URL = "BLAZE_STORE_URL";
+  public final static String BLAZE_ID_HEADER = "BLAZE_ID_HEADER";
   public final static String CBIOPORTAL_URL = "CBIOPORTAL_URL";
 
   // Spring Values (SV)
@@ -90,6 +92,7 @@ public class MtbaConst {
   public final static String SAMPLE_CSV_SAMPLE_ID_HEADER_SV = HEAD_SV + SAMPLE_CSV_SAMPLE_ID_HEADER + ":#{'SAMPLE_ID'}" + BOTTOM_SV;
   public final static String SAMPLE_CSV_PATIENT_ID_HEADER_SV = HEAD_SV + SAMPLE_CSV_PATIENT_ID_HEADER + ":#{'PATIENT_ID'}" + BOTTOM_SV;
   public final static String BLAZE_STORE_URL_SV = HEAD_SV + BLAZE_STORE_URL + ":#{null}" + BOTTOM_SV;
+  public final static String BLAZE_ID_HEADER_SV = HEAD_SV + BLAZE_ID_HEADER + ":#{'BLAZE_ID'}" + BOTTOM_SV;
   public final static String CBIOPORTAL_URL_SV = HEAD_SV + CBIOPORTAL_URL + ":#{null}" + BOTTOM_SV;
 
   // Camunda BP Constants
