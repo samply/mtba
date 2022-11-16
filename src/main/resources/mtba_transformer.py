@@ -1,6 +1,5 @@
 from xml.etree import ElementTree as ET
 import csv
-import re
 import sys
 import uuid
 from hashlib import sha256
@@ -8,14 +7,14 @@ from hashlib import sha256
 Inputfile = sys.argv[1]
 Outputfile = sys.argv[2]
 
-def convert_row(headers, row):
-    columns=re.split(r'\t+', row[0])
-    patient_id=f"{columns[-1]}"
+def convert_row(row):
+    columns=row[0].split("\t")
+    patient_id=columns[blaze_id_column]
     #diagnosis_id="TODO"
     #specimen_id="TODO"
     #time_id="TODO"
     mutation_dktk="M"
-    mutation_mtba=f"{columns[-2]}"
+    mutation_mtba=columns[mutation_column]
     identifier=sha256(''.join(columns).encode('utf-8')).hexdigest()[0:15]
     entry = '<entry>\n' + f'<fullUrl value="http://example.com/Observation/{identifier}" /><resource><Observation xmlns="http://hl7.org/fhir">'
     resource= (f'<id value="{identifier}" />' +
@@ -40,10 +39,13 @@ def convert_row(headers, row):
 with open(Inputfile, 'r') as f:
     r = csv.reader(f)
     headers = next(r)
-    bundle_id=uuid.uuid1()
+    headers = headers[0].split('\t')
+    blaze_id_column = headers.index("BLAZE_ID")
+    mutation_column = headers.index("Hugo_Symbol")
+    bundle_id = uuid.uuid1()
     xml = f'<Bundle xmlns="http://hl7.org/fhir">\n<id value="{bundle_id}"/>\n<type value="transaction"/>\n'
     for row in r:
-        xml += convert_row(headers, row) + '\n'
+        xml += convert_row(row) + '\n'
     xml += '</Bundle>'
     # print(xml)
 
