@@ -1,5 +1,7 @@
 package de.samply.tasks;
 
+import de.samply.blaze.BlazeResponse;
+import de.samply.blaze.Response;
 import de.samply.file.bundle.PathsBundle;
 import de.samply.file.bundle.PathsBundleManager;
 import de.samply.file.bundle.PathsBundleManagerImpl;
@@ -25,10 +27,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -36,7 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class FhirConverterDelegate implements JavaDelegate {
@@ -53,6 +60,9 @@ public class FhirConverterDelegate implements JavaDelegate {
   private String sampleFilename;
   private String sampleFileSampleIdHeader;
   private String sampleFilePatientIdHeader;
+  private String blazeIdHeader;
+
+  private WebClient blazeWebClient;
 
   public FhirConverterDelegate(
       @Value(MtbaConst.MUTATIONS_CSV_FILENAME_SV) String dataMutationFile,
@@ -64,7 +74,8 @@ public class FhirConverterDelegate implements JavaDelegate {
       @Value(MtbaConst.SAMPLE_CSV_FILENAME_SV) String sampleFilename,
       @Value(MtbaConst.SAMPLE_CSV_SAMPLE_ID_HEADER_SV) String sampleFileSamplyIdHeader,
       @Value(MtbaConst.SAMPLE_CSV_PATIENT_ID_HEADER_SV) String sampleFilePatientIdHeader,
-
+      @Value(MtbaConst.BLAZE_STORE_URL_SV) String blazeStoreUrl,
+      @Value(MtbaConst.BLAZE_ID_HEADER_SV) String blazeIdHeader,
       @Autowired TemporalDirectoryManager temporalDirectoryManager
   ) {
     this.dataMutationFile = dataMutationFile;
@@ -77,7 +88,8 @@ public class FhirConverterDelegate implements JavaDelegate {
     this.sampleFilename = sampleFilename;
     this.sampleFileSampleIdHeader = sampleFileSamplyIdHeader;
     this.sampleFilePatientIdHeader = sampleFilePatientIdHeader;
-
+    this.blazeIdHeader = blazeIdHeader;
+    this.blazeWebClient = createBlazeWebClient(blazeStoreUrl);
   }
 
   @Override
@@ -89,20 +101,58 @@ public class FhirConverterDelegate implements JavaDelegate {
     pathsBundle = pathsBundleManager.copyPathsBundleToOutputFolder(pathsBundle,
         temporalDirectoryManager.createTemporalDirectory());
     // Add pseudonym
-    addPseudonymToDataMutationFile(pathsBundle);
+    List<String> pseudonyms = addPseudonymToDataMutationFileAndGetPseudonymList(pathsBundle);
+    // Add Blaze Id
+    addBlazeIdToDataMutationFile(pathsBundle, pseudonyms);
     // Execute script
     PathsBundle outputPathsBundle = executeScriptAndGetResults(
         pathsBundle.getPath(dataMutationFile));
     PathsBundleUtils.addPathsBundleAsVariable(delegateExecution, outputPathsBundle);
   }
 
-  private void addPseudonymToDataMutationFile(PathsBundle pathsBundle)
+  private Map<String, String> fetchPseudonymBlazeIdMap(List<String> pseudonyms) {
+    Map<String, String> pseudonymBlazeIdMap = new HashMap<>();
+    pseudonyms.forEach(pseudonym -> {
+      ResponseEntity<BlazeResponse> blazeResponseEntity = this.blazeWebClient.get().uri(
+          MtbaConst.BLAZE_STORE_API_PATH + MtbaConst.BLAZE_STORE_GET_PATIENT_THROUGH_PSEUDONYM_PATH
+              + pseudonym).retrieve().toEntity(BlazeResponse.class).block();
+      if (blazeResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
+        Response[] responses = blazeResponseEntity.getBody().getEntry();
+        if (responses.length >= 1) {
+          String fullUrl = responses[0].getFullUrl();
+          if (fullUrl != null) {
+            pseudonymBlazeIdMap.put(pseudonym, getBlazeIdFromFullUrl(fullUrl));
+          }
+        } else {
+          //TODO
+        }
+
+      } else {
+        //TODO: Handle HTTP Errors
+      }
+    });
+
+    return pseudonymBlazeIdMap;
+  }
+
+  private String getBlazeIdFromFullUrl(String fullUrl) {
+    return fullUrl.substring(fullUrl.lastIndexOf('/') + 1);
+  }
+
+  private void addBlazeIdToDataMutationFile(PathsBundle pathsBundle, List<String> pseudonyms)
+      throws CsvUpdaterFactoryException, CsvUpdaterException {
+    Map<String, String> pseudonymBlazeIdMap = fetchPseudonymBlazeIdMap(pseudonyms);
+    addBlazeIdToDataMutationFile(pathsBundle, pseudonymBlazeIdMap);
+  }
+
+  private List<String> addPseudonymToDataMutationFileAndGetPseudonymList(PathsBundle pathsBundle)
       throws CsvReaderException, CsvUpdaterFactoryException, CsvUpdaterException {
     Map<String, String> patientIdPseudonymMap = fetchPatientIdPseudonymMap(pathsBundle);
     Map<String, String> sampleIdPatientIdMap = fetchSampleIdPatientIdMap(pathsBundle);
     Map<String, String> sampleIdPseudonymMap = convertToSampleIdPseudonymMap(patientIdPseudonymMap,
         sampleIdPatientIdMap);
     addPseudonymToDataMutationFile(pathsBundle, sampleIdPseudonymMap);
+    return new ArrayList<>(sampleIdPseudonymMap.values());
   }
 
   private Map<String, String> fetchPatientIdPseudonymMap(PathsBundle pathsBundle)
@@ -161,6 +211,29 @@ public class FhirConverterDelegate implements JavaDelegate {
       csvRecordHeaderValues.getHeaderValueMap().put(dataMutationFileSampleIdHeader, sampleId);
       csvRecordHeaderValues.getHeaderValueMap()
           .put(idManagerPseudonymIdType, sampleIdPseudonymMap.get(sampleId));
+      pivotedCsvRecordHeaderValues.addCsvRecordHeaderValues(csvRecordHeaderValues);
+    });
+    return pivotedCsvRecordHeaderValues;
+  }
+
+  private void addBlazeIdToDataMutationFile(PathsBundle pathsBundle,
+      Map<String, String> pseudonymBlazeIdMap)
+      throws CsvUpdaterFactoryException, CsvUpdaterException {
+    CsvUpdater csvUpdater = csvUpdaterFactory.createCsvUpdater(
+        new CsvReaderParameters(dataMutationFile, pathsBundle));
+    csvUpdater.addPivotedCsvRecordHeaderValues(
+        createPivotedCsvRecordHeaderValuesToAddBlazeIdToDataMutationFile(pseudonymBlazeIdMap));
+  }
+
+  private PivotedCsvRecordHeaderValues createPivotedCsvRecordHeaderValuesToAddBlazeIdToDataMutationFile(
+      Map<String, String> pseudonymBlazeIdMap) {
+    PivotedCsvRecordHeaderValues pivotedCsvRecordHeaderValues = new PivotedCsvRecordHeaderValues(
+        idManagerPseudonymIdType);
+    pseudonymBlazeIdMap.keySet().forEach(pseudonym -> {
+      CsvRecordHeaderValues csvRecordHeaderValues = new CsvRecordHeaderValues();
+      csvRecordHeaderValues.getHeaderValueMap().put(idManagerPseudonymIdType, pseudonym);
+      csvRecordHeaderValues.getHeaderValueMap()
+          .put(blazeIdHeader, pseudonymBlazeIdMap.get(pseudonym));
       pivotedCsvRecordHeaderValues.addCsvRecordHeaderValues(csvRecordHeaderValues);
     });
     return pivotedCsvRecordHeaderValues;
@@ -246,6 +319,15 @@ public class FhirConverterDelegate implements JavaDelegate {
   private void deleteScriptPath(Path scriptPath) throws IOException {
     Files.delete(scriptPath);
     Files.delete(scriptPath.getParent());
+  }
+
+  private WebClient createBlazeWebClient(String blazeStoreUrl) {
+    //TODO: Set proxy
+    return WebClient.builder().baseUrl(blazeStoreUrl)
+        .defaultHeaders(httpHeaders -> {
+          httpHeaders.set(HttpHeaders.CONTENT_TYPE, "application/xml+fhir");
+          //TODO
+        }).build();
   }
 
 }
