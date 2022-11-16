@@ -27,7 +27,7 @@ def convert_row(row):
                #f'<effectiveDateTime value="{time_id}" />' +
                '<valueCodeableConcept><coding><system value="http://dktk.dkfz.de/fhir/onco/core/CodeSystem/GenetischeVarianteCS" />' +
                f'<code value="{mutation_dktk}" /></coding></valueCodeableConcept>' +
-               '<component><code><coding><system value="http://loinc.org" /><code value="21899-0"/></coding></code>' +
+               '<component><code><coding><system value="http://loinc.org" /><code value="48018-6"/></coding></code>' +
                f'<valueCodeableConcept><coding><system value="http://www.genenames.org" /><code value="{mutation_mtba}" />' +
                '</coding></valueCodeableConcept></component>')
 
