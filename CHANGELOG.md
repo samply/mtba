@@ -32,3 +32,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Blaze Store Exporter
 - Python to Docker
 - Blaze Id
+
+### Changed
+- Create temporal root directory if it does not exist
