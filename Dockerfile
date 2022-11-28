@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-al2022-RC
+FROM amazoncorretto:17.0.5-alpine
 
 COPY target/mtba.jar /app/
 
