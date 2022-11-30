@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Blaze Id
 - .dockerignore
 - Github build.yml
+- Fetch Bundle from Blaze Store
 
 ### Changed
 - Create temporal root directory if it does not exist

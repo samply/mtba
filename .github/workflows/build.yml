@@ -6,13 +6,13 @@ on:
   push:
     branches:
       - main
-      - developer
+      - develop
     tags:
       - 'v*.*.*'
   pull_request:
     branches:
       - main
-      - developer
+      - develop
 
 jobs:
   test:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'corretto'
+          distribution: 'temurin'
           java-version: '17'
 
       - name: Check out Git repository
