@@ -1,8 +1,8 @@
-FROM amazoncorretto:17-al2022-RC
+FROM eclipse-temurin:17-jre-alpine
 
 COPY target/mtba.jar /app/
 
-RUN yum install python3
+RUN apk update && apk add python3
 
 WORKDIR /app
 

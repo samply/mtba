@@ -30,7 +30,7 @@ public class PathsBundleFactoryDelegate implements JavaDelegate {
   @Override
   public void execute(DelegateExecution delegateExecution) throws Exception {
 
-    logger.info("Create Bundle");
+    logger.info("Check for new files");
     PathsBundle pathsBundle = pathsBundleManager.fetchNextPathsBundleFromInputFolder();
     delegateExecution.setVariable(MtbaConst.IS_PATHS_BUNDLE_EMPTY, pathsBundle.isPathBundleEmpty());
 
