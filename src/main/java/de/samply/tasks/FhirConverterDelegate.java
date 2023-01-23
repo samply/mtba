@@ -17,6 +17,8 @@ import de.samply.file.csv.updater.CsvUpdaterFactoryException;
 import de.samply.file.csv.updater.CsvUpdaterFactoryImpl;
 import de.samply.file.csv.updater.PivotedCsvRecordHeaderValues;
 import de.samply.spring.MtbaConst;
+import de.samply.utils.FileConfig;
+import de.samply.utils.FileConfigUtils;
 import de.samply.utils.PathsBundleUtils;
 import de.samply.utils.TemporalDirectoryManager;
 import java.io.BufferedReader;
@@ -24,7 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ public class FhirConverterDelegate implements JavaDelegate {
   private final Logger logger = LoggerFactory.getLogger(FhirConverterDelegate.class);
   private final CsvUpdaterFactory csvUpdaterFactory = new CsvUpdaterFactoryImpl();
   private TemporalDirectoryManager temporalDirectoryManager;
+  private FileConfig fileConfig;
   private String dataMutationFile;
   private String scriptInterpreter;
   private String patientFilename;
@@ -76,8 +78,10 @@ public class FhirConverterDelegate implements JavaDelegate {
       @Value(MtbaConst.SAMPLE_CSV_PATIENT_ID_HEADER_SV) String sampleFilePatientIdHeader,
       @Value(MtbaConst.BLAZE_STORE_URL_SV) String blazeStoreUrl,
       @Value(MtbaConst.BLAZE_ID_HEADER_SV) String blazeIdHeader,
-      @Autowired TemporalDirectoryManager temporalDirectoryManager
+      @Autowired TemporalDirectoryManager temporalDirectoryManager,
+      @Autowired FileConfig fileConfig
   ) {
+    FileConfigUtils.addFileConfig(fileConfig, (CsvUpdaterFactoryImpl) csvUpdaterFactory);
     this.dataMutationFile = dataMutationFile;
     this.scriptInterpreter = scriptInterpreter;
     this.patientFilename = patientFilename;
@@ -90,7 +94,9 @@ public class FhirConverterDelegate implements JavaDelegate {
     this.sampleFilePatientIdHeader = sampleFilePatientIdHeader;
     this.blazeIdHeader = blazeIdHeader;
     this.blazeWebClient = createBlazeWebClient(blazeStoreUrl);
+    this.fileConfig = fileConfig;
   }
+
 
   @Override
   public void execute(DelegateExecution delegateExecution) throws Exception {
@@ -159,6 +165,7 @@ public class FhirConverterDelegate implements JavaDelegate {
       throws CsvReaderException {
     Map<String, String> patientIdPseudonymMap = new HashMap<>();
     CsvReaderParameters csvReaderParameters = new CsvReaderParameters(patientFilename, pathsBundle);
+    FileConfigUtils.addFileConfig(fileConfig, csvReaderParameters);
     csvReaderParameters.setHeaders(
         new HashSet<>(Arrays.asList(patientFilePatientIdHeader, idManagerPseudonymIdType)));
     CsvReader patientFileReader = new CsvReaderImpl(csvReaderParameters);
@@ -174,6 +181,7 @@ public class FhirConverterDelegate implements JavaDelegate {
       throws CsvReaderException {
     Map<String, String> sampleIdPatientIdMap = new HashMap<>();
     CsvReaderParameters csvReaderParameters = new CsvReaderParameters(sampleFilename, pathsBundle);
+    FileConfigUtils.addFileConfig(fileConfig, csvReaderParameters);
     csvReaderParameters.setHeaders(new HashSet<>(Arrays.asList(sampleFilePatientIdHeader,
         sampleFileSampleIdHeader)));
     CsvReader sampleFileReader = new CsvReaderImpl(csvReaderParameters);
@@ -196,8 +204,10 @@ public class FhirConverterDelegate implements JavaDelegate {
   private void addPseudonymToDataMutationFile(PathsBundle pathsBundle,
       Map<String, String> sampleIdPseudonymMap)
       throws CsvUpdaterFactoryException, CsvUpdaterException {
-    CsvUpdater csvUpdater = csvUpdaterFactory.createCsvUpdater(
-        new CsvReaderParameters(dataMutationFile, pathsBundle));
+    CsvReaderParameters csvReaderParameters = new CsvReaderParameters(dataMutationFile,
+        pathsBundle);
+    FileConfigUtils.addFileConfig(fileConfig, csvReaderParameters);
+    CsvUpdater csvUpdater = csvUpdaterFactory.createCsvUpdater(csvReaderParameters);
     csvUpdater.addPivotedCsvRecordHeaderValues(
         createPivotedCsvRecordHeaderValuesToAddPseudonymToDataMutationFile(sampleIdPseudonymMap));
   }
@@ -219,8 +229,10 @@ public class FhirConverterDelegate implements JavaDelegate {
   private void addBlazeIdToDataMutationFile(PathsBundle pathsBundle,
       Map<String, String> pseudonymBlazeIdMap)
       throws CsvUpdaterFactoryException, CsvUpdaterException {
-    CsvUpdater csvUpdater = csvUpdaterFactory.createCsvUpdater(
-        new CsvReaderParameters(dataMutationFile, pathsBundle));
+    CsvReaderParameters csvReaderParameters = new CsvReaderParameters(dataMutationFile,
+        pathsBundle);
+    FileConfigUtils.addFileConfig(fileConfig, csvReaderParameters);
+    CsvUpdater csvUpdater = csvUpdaterFactory.createCsvUpdater(csvReaderParameters);
     csvUpdater.addPivotedCsvRecordHeaderValues(
         createPivotedCsvRecordHeaderValuesToAddBlazeIdToDataMutationFile(pseudonymBlazeIdMap));
   }
@@ -263,7 +275,7 @@ public class FhirConverterDelegate implements JavaDelegate {
 
   private void logProcess(Process process) throws IOException {
     try (var reader = new BufferedReader(
-        new InputStreamReader(process.getInputStream()))) {
+        new InputStreamReader(process.getInputStream(), fileConfig.getFileCharset()))) {
       String line = null;
       while ((line = reader.readLine()) != null) {
         logger.debug(line);
@@ -293,7 +305,8 @@ public class FhirConverterDelegate implements JavaDelegate {
   private Path copyScriptToTemporalPath() throws IOException {
     try (InputStream inputStream = getClass().getClassLoader()
         .getResourceAsStream(MtbaConst.MTBA_TRANSFORMER_SCRIPT_FILENAME);
-        InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        InputStreamReader streamReader = new InputStreamReader(inputStream,
+            fileConfig.getFileCharset());
         BufferedReader reader = new BufferedReader(streamReader)) {
       return copyScriptToTemporalPath(reader);
     }
@@ -307,11 +320,11 @@ public class FhirConverterDelegate implements JavaDelegate {
   }
 
   private void writeTemporalPath(BufferedReader reader, Path scriptPath) throws IOException {
-    try (FileWriter fileWriter = new FileWriter(scriptPath.toFile())) {
+    try (FileWriter fileWriter = new FileWriter(scriptPath.toFile(), fileConfig.getFileCharset())) {
       String line;
       while ((line = reader.readLine()) != null) {
         fileWriter.write(line);
-        fileWriter.write('\n');
+        fileWriter.write(fileConfig.getEndOfLine());
       }
     }
   }

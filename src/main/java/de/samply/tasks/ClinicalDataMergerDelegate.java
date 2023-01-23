@@ -9,6 +9,8 @@ import de.samply.file.csv.reader.CsvReaderException;
 import de.samply.file.csv.reader.CsvReaderImpl;
 import de.samply.file.csv.reader.CsvReaderParameters;
 import de.samply.spring.MtbaConst;
+import de.samply.utils.FileConfig;
+import de.samply.utils.FileConfigUtils;
 import de.samply.utils.PathsBundleUtils;
 import de.samply.utils.TemporalDirectoryManager;
 import java.util.ArrayList;
@@ -31,12 +33,15 @@ public class ClinicalDataMergerDelegate implements JavaDelegate {
   private BlazeStoreClient blazeStoreClient;
   private String patientFilename;
   private String idManagerPseudonymIdType;
+  private FileConfig fileConfig;
 
   public ClinicalDataMergerDelegate(
       @Autowired TemporalDirectoryManager temporalDirectoryManager,
       @Autowired BlazeStoreClient blazeStoreClient,
+      @Autowired FileConfig fileConfig,
       @Value(MtbaConst.PATIENT_CSV_FILENAME_SV) String patientFilename,
       @Value(MtbaConst.ID_MANAGER_PSEUDONYM_ID_TYPE_SV) String idManagerPseudonymIdType) {
+    this.fileConfig = fileConfig;
     this.temporalDirectoryManager = temporalDirectoryManager;
     this.blazeStoreClient = blazeStoreClient;
     this.patientFilename = patientFilename;
@@ -55,7 +60,7 @@ public class ClinicalDataMergerDelegate implements JavaDelegate {
     //TODO
   }
 
-  private List<String> getPatientPseudonyms(PathsBundle pathsBundle){
+  private List<String> getPatientPseudonyms(PathsBundle pathsBundle) {
     try {
       return getPatientPseudonymsWithoutExceptionManagement(pathsBundle);
     } catch (CsvReaderException e) {
@@ -69,6 +74,7 @@ public class ClinicalDataMergerDelegate implements JavaDelegate {
     CsvReaderParameters csvReaderParameters = new CsvReaderParameters(patientFilename, pathsBundle);
     csvReaderParameters.setHeaders(
         new HashSet<>(Arrays.asList(idManagerPseudonymIdType)));
+    FileConfigUtils.addFileConfig(fileConfig, csvReaderParameters);
     CsvReader patientFileReader = new CsvReaderImpl(csvReaderParameters);
     patientFileReader.readCsvRecordHeaderValues().forEach(csvRecordHeaderValues -> {
       String pseudonym = csvRecordHeaderValues.getValue(idManagerPseudonymIdType);
@@ -77,7 +83,7 @@ public class ClinicalDataMergerDelegate implements JavaDelegate {
     return patientPseudonymList;
   }
 
-  private void fetchClinicalDataFromBlazeStore(List<String> patientPseudonyms){
+  private void fetchClinicalDataFromBlazeStore(List<String> patientPseudonyms) {
     blazeStoreClient.fetchPatients(patientPseudonyms);
   }
 

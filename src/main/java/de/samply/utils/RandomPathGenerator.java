@@ -1,5 +1,6 @@
 package de.samply.utils;
 
+import de.samply.spring.MtbaConst;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,7 +71,7 @@ public class RandomPathGenerator {
 
     Path file = directory.resolve(FILE_PREFIX + extension);
     List<String> randomContent = generateRandomContent();
-    Files.write(file, randomContent);
+    Files.write(file, randomContent, MtbaConst.DEFAULT_CHARSET);
 
     return file;
 
@@ -101,7 +102,7 @@ public class RandomPathGenerator {
     for (int i = 0; i < columnsNumber; i++) {
       stringBuilder.append(getHeader(i + initialCounter));
       if (i < columnsNumber - 1) {
-        stringBuilder.append(Constants.DEFAULT_DELIMITER);
+        stringBuilder.append(MtbaConst.DEFAULT_CSV_DELIMITER);
       }
     }
     return stringBuilder.toString();
@@ -127,7 +128,7 @@ public class RandomPathGenerator {
         String randomWord = randomWords.get(random.nextInt(randomWords.size()));
         stringBuilder.append(randomWord);
         if (j < columnsNumber - 1) {
-          stringBuilder.append(Constants.DEFAULT_DELIMITER);
+          stringBuilder.append(MtbaConst.DEFAULT_CSV_DELIMITER);
         }
 
       }

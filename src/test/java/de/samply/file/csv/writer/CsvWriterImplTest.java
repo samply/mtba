@@ -9,7 +9,7 @@ import de.samply.file.csv.reader.CsvReader;
 import de.samply.file.csv.reader.CsvReaderException;
 import de.samply.file.csv.reader.CsvReaderImpl;
 import de.samply.file.csv.reader.CsvReaderParameters;
-import de.samply.utils.Constants;
+import de.samply.spring.MtbaConst;
 import de.samply.utils.RandomPathGenerator;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -95,7 +95,7 @@ class CsvWriterImplTest {
 
     CsvRecordHeaderOrder csvRecordHeaderOrder = new CsvRecordHeaderOrder();
 
-    String[] headers = Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER);
+    String[] headers = Files.readAllLines(path).get(0).split(MtbaConst.DEFAULT_CSV_DELIMITER);
 
     boolean atLeastOne = false;
     int order = 0;

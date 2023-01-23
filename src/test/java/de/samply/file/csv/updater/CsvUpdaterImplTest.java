@@ -1,32 +1,32 @@
 package de.samply.file.csv.updater;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.samply.file.bundle.PathsBundle;
 import de.samply.file.csv.CsvRecordHeaderValues;
 import de.samply.file.csv.reader.CsvReaderException;
 import de.samply.file.csv.reader.CsvReaderImpl;
 import de.samply.file.csv.reader.CsvReaderParameters;
-import de.samply.utils.Constants;
+import de.samply.spring.MtbaConst;
 import de.samply.utils.RandomPathGenerator;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashSet;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class CsvUpdaterImplTest {
@@ -162,7 +162,7 @@ class CsvUpdaterImplTest {
         Arrays.stream(RandomPathGenerator.
                 generateRandomContent(1, numberOfAdditionalHeaders)
                 .get(0)
-                .split(Constants.DEFAULT_DELIMITER))
+                .split(MtbaConst.DEFAULT_CSV_DELIMITER))
             .forEach(value -> csvRecordHeaderValues.getHeaderValueMap().put(header, value)));
 
     return csvRecordHeaderValues;
@@ -171,7 +171,7 @@ class CsvUpdaterImplTest {
 
   private Set<String> createHeaders(int initialCounter, int numberOfHeaders) {
     return Set.of(RandomPathGenerator.generateHeaders(initialCounter, numberOfHeaders)
-        .split(Constants.DEFAULT_DELIMITER));
+        .split(MtbaConst.DEFAULT_CSV_DELIMITER));
   }
 
   @Test
@@ -195,7 +195,7 @@ class CsvUpdaterImplTest {
     HashSet<String> headers = new HashSet<>();
 
     boolean atLeastOneHeader = false;
-    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
+    for (String header : Files.readAllLines(path).get(0).split(MtbaConst.DEFAULT_CSV_DELIMITER)) {
       if (!atLeastOneHeader || Math.random() < 0.5) {
         headers.add(header);
         atLeastOneHeader = true;
@@ -208,7 +208,7 @@ class CsvUpdaterImplTest {
 
   private Set<String> getAllHeaders(Path path) throws IOException {
     HashSet<String> headers = new HashSet<>();
-    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
+    for (String header : Files.readAllLines(path).get(0).split(MtbaConst.DEFAULT_CSV_DELIMITER)) {
       headers.add(header);
     }
     return headers;

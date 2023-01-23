@@ -33,6 +33,7 @@ public class CsvUpdaterImpl implements CsvUpdater {
   private CsvWriterParameters csvWriterParameters;
   private CsvWriterFactory csvWriterFactory;
 
+
   /**
    * Updates a csv file with new data.
    *
@@ -45,6 +46,20 @@ public class CsvUpdaterImpl implements CsvUpdater {
     this.csvWriterFactory = new CsvWriterFactoryImpl(
         csvWriterParameters.getPathsBundle(),
         csvWriterParameters.getMaxNumberOfRowsForFlush());
+    addFileConfigToCsvWriterFactory((CsvWriterFactoryImpl) csvWriterFactory, csvUpdaterParameters);
+  }
+
+  private void addFileConfigToCsvWriterFactory(CsvWriterFactoryImpl csvWriterFactory,
+      CsvUpdaterParameters csvUpdaterParameters) {
+    if (csvUpdaterParameters.getDelimiter() != null) {
+      csvWriterFactory.setCsvDelimiter(csvUpdaterParameters.getDelimiter());
+    }
+    if (csvUpdaterParameters.getCharset() != null) {
+      csvWriterFactory.setCharset(csvUpdaterParameters.getCharset());
+    }
+    if (csvUpdaterParameters.getEndOfLine() != null) {
+      csvWriterFactory.setFileEndOfLine(csvUpdaterParameters.getEndOfLine());
+    }
   }
 
   /**
@@ -200,7 +215,6 @@ public class CsvUpdaterImpl implements CsvUpdater {
   private class DeleteColumnConsumer extends CsvRecordHeaderValuesCopyConsumer {
 
     private Set<String> columnsToBeDeleted;
-    private CsvWriter csvWriter;
 
     public DeleteColumnConsumer(Set<String> columnsToBeDeleted) {
       this.columnsToBeDeleted = columnsToBeDeleted;
@@ -248,7 +262,6 @@ public class CsvUpdaterImpl implements CsvUpdater {
   private class RenameConsumer extends CsvRecordHeaderValuesCopyConsumer {
 
     private Map<String, String> oldHeaderToNewHeaderMap;
-    private CsvWriter csvWriter;
 
     public RenameConsumer(Map<String, String> oldHeaderToNewHeaderMap) {
       this.oldHeaderToNewHeaderMap = oldHeaderToNewHeaderMap;

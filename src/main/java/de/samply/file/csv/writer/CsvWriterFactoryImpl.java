@@ -2,11 +2,16 @@ package de.samply.file.csv.writer;
 
 import de.samply.file.bundle.PathsBundle;
 import de.samply.file.csv.CsvRecordHeaderOrder;
+import de.samply.spring.MtbaConst;
+import java.nio.charset.Charset;
 
 public class CsvWriterFactoryImpl implements CsvWriterFactory {
 
   private PathsBundle pathsBundle;
   private Integer maxNumberOfRowsPerFlush = 100;
+  private String csvDelimiter = MtbaConst.DEFAULT_CSV_DELIMITER;
+  private String fileEndOfLine = MtbaConst.DEFAULT_END_OF_LINE;
+  private Charset charset = MtbaConst.DEFAULT_CHARSET;
 
   /**
    * Generates csv writers.
@@ -66,9 +71,25 @@ public class CsvWriterFactoryImpl implements CsvWriterFactory {
     csvWriterParameters.setCsvRecordHeaderOrder(csvRecordHeaderOrder);
     csvWriterParameters.setOutputFilename(outputFilename);
     csvWriterParameters.setPathsBundle(pathsBundle);
+    csvWriterParameters.setEndOfLine(fileEndOfLine);
+    csvWriterParameters.setCharset(charset);
+    csvWriterParameters.setDelimiter(csvDelimiter);
+    csvWriterParameters.setMaxNumberOfRowsForFlush(maxNumberOfRowsPerFlush);
 
     return csvWriterParameters;
 
+  }
+
+  public void setCsvDelimiter(String csvDelimiter) {
+    this.csvDelimiter = csvDelimiter;
+  }
+
+  public void setFileEndOfLine(String fileEndOfLine) {
+    this.fileEndOfLine = fileEndOfLine;
+  }
+
+  public void setCharset(Charset charset) {
+    this.charset = charset;
   }
 
 }
