@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fetch Bundle from Blaze Store
 - Config for csv delimiter, eol and charset
 - MUTATIONS_CSV_SCRIPT_INTERPRETER, NEW_FILES_DIRECTORY and PERSIST_DIRECTORY in Dockerfile
+- Apk upgrade in Dockerfile
 
 ### Changed
 - Create temporal root directory if it does not exist
