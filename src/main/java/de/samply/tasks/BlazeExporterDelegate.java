@@ -3,6 +3,7 @@ package de.samply.tasks;
 import de.samply.blaze.BlazeResponse;
 import de.samply.file.bundle.PathsBundle;
 import de.samply.spring.MtbaConst;
+import de.samply.utils.FileConfig;
 import de.samply.utils.PathsBundleUtils;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +14,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,13 @@ public class BlazeExporterDelegate implements JavaDelegate {
 
   private final Logger logger = LoggerFactory.getLogger(BlazeExporterDelegate.class);
   private WebClient webClient;
+  private FileConfig fileConfig;
+
 
   public BlazeExporterDelegate(
-      @Value(MtbaConst.BLAZE_STORE_URL_SV) String blazeStoreUrl) {
+      @Value(MtbaConst.BLAZE_STORE_URL_SV) String blazeStoreUrl, @Autowired FileConfig fileConfig) {
     this.webClient = createWebClient(blazeStoreUrl);
+    this.fileConfig = fileConfig;
   }
 
   @Override
@@ -72,7 +77,7 @@ public class BlazeExporterDelegate implements JavaDelegate {
 
   private String createBodyWithoutExceptionHandler(Path path) throws IOException {
     StringBuilder stringBuilder = new StringBuilder();
-    try (Stream<String> lines = Files.lines(path)) {
+    try (Stream<String> lines = Files.lines(path, fileConfig.getFileCharset())) {
       lines.forEach(line -> stringBuilder.append(line));
     }
     return stringBuilder.toString();

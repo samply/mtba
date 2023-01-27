@@ -1,7 +1,7 @@
 package de.samply.file.csv;
 
 import de.samply.file.bundle.PathsBundle;
-import de.samply.utils.Constants;
+import de.samply.spring.MtbaConst;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,10 +26,10 @@ public class TestUtils {
     try (Stream<String> lines = Files.lines(path)) {
       lines.forEach(line -> {
         if (counter.getAndIncrement() == 0) { //Headers
-          Arrays.stream(line.split(Constants.DEFAULT_DELIMITER))
+          Arrays.stream(line.split(MtbaConst.DEFAULT_CSV_DELIMITER))
               .forEach(header -> headers.add(header));
         } else {
-          String[] elements = line.split(Constants.DEFAULT_DELIMITER);
+          String[] elements = line.split(MtbaConst.DEFAULT_CSV_DELIMITER);
           Map<String, String> headerValueMap = new HashMap<>();
           result.add(headerValueMap);
           for (int i = 0; i < elements.length; i++) {
@@ -46,7 +46,7 @@ public class TestUtils {
     HashSet<String> headers = new HashSet<>();
 
     boolean atLeastOneHeader = false;
-    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
+    for (String header : Files.readAllLines(path).get(0).split(MtbaConst.DEFAULT_CSV_DELIMITER)) {
       if (!atLeastOneHeader || Math.random() < 0.5) {
         headers.add(header);
         atLeastOneHeader = true;
@@ -59,7 +59,7 @@ public class TestUtils {
 
   public static Set<String> getAllHeaders(Path path) throws IOException {
     HashSet<String> headers = new HashSet<>();
-    for (String header : Files.readAllLines(path).get(0).split(Constants.DEFAULT_DELIMITER)) {
+    for (String header : Files.readAllLines(path).get(0).split(MtbaConst.DEFAULT_CSV_DELIMITER)) {
       headers.add(header);
     }
     return headers;

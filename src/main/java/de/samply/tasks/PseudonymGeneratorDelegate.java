@@ -19,6 +19,8 @@ import de.samply.pseudonymisation.PatientFields;
 import de.samply.pseudonymisation.PatientFieldsUtils;
 import de.samply.pseudonymisation.PseudonymisationClient;
 import de.samply.spring.MtbaConst;
+import de.samply.utils.FileConfig;
+import de.samply.utils.FileConfigUtils;
 import de.samply.utils.PathsBundleUtils;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,6 +58,7 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
   private final static String PATIENT_CSV_TEMP_HEADER = "TEMP_PAT_ID";
   private List<String> idatHeaders = new ArrayList<>();
   private Map<String, BiConsumer<PatientFields, String>> headerPatientFieldsMap = new HashMap<>();
+  private FileConfig fileConfig;
 
 
   public PseudonymGeneratorDelegate(
@@ -70,14 +73,17 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
       @Value(MtbaConst.ID_MANAGER_PSEUDONYM_ID_TYPE_SV) String idManagerPseudonymIdType,
       @Value(MtbaConst.CSV_REMOVE_IDAT_SV) String removeIdat,
       @Autowired PseudonymisationClient pseudonymisationClient,
-      @Autowired PatientFieldsUtils patientFieldsUtils) {
+      @Autowired PatientFieldsUtils patientFieldsUtils,
+      @Autowired FileConfig fileConfig) {
 
+    FileConfigUtils.addFileConfig(fileConfig, (CsvUpdaterFactoryImpl) csvUpdaterFactory);
     this.pseudonymisationClient = pseudonymisationClient;
     this.patientFieldsUtils = patientFieldsUtils;
     this.removeIdat = Boolean.valueOf(removeIdat);
     this.patientCsvLocalId = patientCsvLocalId;
     this.patientCsvFilename = patientCsvFilename;
     this.idManagerPseudonymIdType = idManagerPseudonymIdType;
+    this.fileConfig = fileConfig;
 
     String[] tempIdatHeaders = {patientCsvFirstNameHeader, patientCsvLastNameHeader,
         patientCsvPreviousNamesHeader, patientCsvBirthdayHeader, patientCsvCitizenshipHeader,
@@ -134,8 +140,10 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
 
   private CsvUpdater createCsvUpdater(PathsBundle pathsBundle, String filename)
       throws CsvUpdaterFactoryException {
-    return csvUpdaterFactory.createCsvUpdater(
-        new CsvReaderParameters(patientCsvFilename, pathsBundle));
+    CsvReaderParameters csvReaderParameters = new CsvReaderParameters(patientCsvFilename,
+        pathsBundle);
+    FileConfigUtils.addFileConfig(fileConfig, csvReaderParameters);
+    return csvUpdaterFactory.createCsvUpdater(csvReaderParameters);
   }
 
   private void removeIdatAndTempIdHeaders(PathsBundle pathsBundle)
@@ -223,6 +231,7 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
     csvReaderParameters.setPathsBundle(pathsBundle);
     csvReaderParameters.setHeaders(getIdatAndTempIdHeaders());
     csvReaderParameters.setFilename(filename);
+    FileConfigUtils.addFileConfig(fileConfig, csvReaderParameters);
     return csvReaderParameters;
   }
 
@@ -230,7 +239,7 @@ public class PseudonymGeneratorDelegate implements JavaDelegate {
       throws IOException {
     Path path = pathsBundle.getPath(patientCsvFilename);
     if (Files.exists(path)) {
-      try (Stream<String> lines = Files.lines(path)) {
+      try (Stream<String> lines = Files.lines(path, fileConfig.getFileCharset())) {
         Optional<String> first = lines.findFirst();
         return (first.isPresent()) ? first.get().contains(idManagerPseudonymIdType) : false;
       }

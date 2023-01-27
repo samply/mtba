@@ -1,6 +1,7 @@
 package de.samply.file.csv.reader;
 
 import de.samply.file.bundle.PathsBundle;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +11,10 @@ public class CsvReaderParameters {
   private Set<String> headers = new HashSet<>();
   private String filename;
   private PathsBundle pathsBundle;
+
+  private String delimiter;
+  private String endOfLine;
+  private Charset charset;
 
   public CsvReaderParameters() {
   }
@@ -61,6 +66,30 @@ public class CsvReaderParameters {
 
   public Path getPath() {
     return (pathsBundle != null && filename != null) ? pathsBundle.getPath(filename) : null;
+  }
+
+  public String getDelimiter() {
+    return delimiter;
+  }
+
+  public void setDelimiter(String delimiter) {
+    this.delimiter = delimiter;
+  }
+
+  public String getEndOfLine() {
+    return endOfLine;
+  }
+
+  public void setEndOfLine(String endOfLine) {
+    this.endOfLine = endOfLine;
+  }
+
+  public Charset getCharset() {
+    return charset;
+  }
+
+  public void setCharset(Charset charset) {
+    this.charset = charset;
   }
 
 }

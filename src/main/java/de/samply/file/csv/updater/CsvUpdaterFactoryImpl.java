@@ -5,12 +5,13 @@ import de.samply.file.csv.CsvRecordHeaderOrder;
 import de.samply.file.csv.reader.CsvReaderParameters;
 import de.samply.file.csv.writer.CsvWriterException;
 import de.samply.file.csv.writer.CsvWriterParameters;
-import de.samply.utils.Constants;
+import de.samply.spring.MtbaConst;
+import de.samply.utils.FileConfigUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVFormat.Builder;
 import org.apache.commons.csv.CSVParser;
 
@@ -18,7 +19,9 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
 
   public static final String CSV_UPDATE_FILENAME_EXTENSION = "-updating.csv";
   private int maxNumberOfRowsPerFlush = 100;
-  private String delimiter = Constants.DEFAULT_DELIMITER;
+  private String delimiter = MtbaConst.DEFAULT_CSV_DELIMITER;
+  private String endOfLine = MtbaConst.DEFAULT_END_OF_LINE;
+  private Charset charset = MtbaConst.DEFAULT_CHARSET;
 
 
   public CsvUpdaterFactoryImpl() {
@@ -62,6 +65,10 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
     csvUpdaterParameters.setCsvReaderParameters(csvReaderParameters);
     csvUpdaterParameters.setCsvWriterParameters(csvWriterParameters);
 
+    csvUpdaterParameters.setCharset(this.charset);
+    csvUpdaterParameters.setDelimiter(this.delimiter);
+    csvUpdaterParameters.setEndOfLine(this.endOfLine);
+
     return new CsvUpdaterImpl(csvUpdaterParameters);
 
   }
@@ -80,6 +87,10 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
     csvWriterParameters.setOutputFilename(outputFilename);
     csvWriterParameters.setMaxNumberOfRowsForFlush(maxNumberOfRowsPerFlush);
     csvWriterParameters.setCsvRecordHeaderOrder(csvRecordHeaderOrder);
+
+    csvWriterParameters.setDelimiter(delimiter);
+    csvWriterParameters.setCharset(charset);
+    csvWriterParameters.setEndOfLine(endOfLine);
 
     return csvWriterParameters;
 
@@ -104,12 +115,19 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
 
     CsvRecordHeaderOrder csvRecordHeaderOrder = new CsvRecordHeaderOrder();
 
-    BufferedReader bufferedReader = Files.newBufferedReader(inputPath);
-    CSVParser csvParser = Builder.create().setHeader().setSkipHeaderRecord(true).setDelimiter(
-        delimiter).build().parse(bufferedReader);
-    int counter = 0;
-    for (String header : csvParser.getHeaderNames()) {
-      csvRecordHeaderOrder.addHeader(header, counter++);
+    BufferedReader bufferedReader = Files.newBufferedReader(inputPath, charset);
+    try (CSVParser csvParser = Builder
+        .create()
+        .setHeader()
+        .setSkipHeaderRecord(true)
+        .setDelimiter(delimiter)
+        .setRecordSeparator(endOfLine)
+        .build()
+        .parse(bufferedReader)) {
+      int counter = 0;
+      for (String header : csvParser.getHeaderNames()) {
+        csvRecordHeaderOrder.addHeader(header, counter++);
+      }
     }
 
     return csvRecordHeaderOrder;
@@ -118,6 +136,14 @@ public class CsvUpdaterFactoryImpl implements CsvUpdaterFactory {
 
   public void setDelimiter(String delimiter) {
     this.delimiter = delimiter;
+  }
+
+  public void setEndOfLine(String endOfLine) {
+    this.endOfLine = endOfLine;
+  }
+
+  public void setCharset(Charset charset) {
+    this.charset = charset;
   }
 
 }

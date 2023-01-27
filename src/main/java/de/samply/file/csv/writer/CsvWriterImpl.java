@@ -2,9 +2,10 @@ package de.samply.file.csv.writer;
 
 import de.samply.file.csv.CsvRecordHeaderOrder;
 import de.samply.file.csv.CsvRecordHeaderValues;
-import de.samply.utils.Constants;
+import de.samply.spring.MtbaConst;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +23,9 @@ public class CsvWriterImpl implements CsvWriter {
   private CSVPrinter csvPrinter;
   private int maxNumberOfRowsForFlush = 100;
   private int flushCounter = 0;
-  private String delimiter = Constants.DEFAULT_DELIMITER;
+  private String delimiter = MtbaConst.DEFAULT_CSV_DELIMITER;
+  private String endOfLine = MtbaConst.DEFAULT_END_OF_LINE;
+  private Charset charset = MtbaConst.DEFAULT_CHARSET;
 
   /**
    * Writes csv records in csv file.
@@ -32,11 +35,24 @@ public class CsvWriterImpl implements CsvWriter {
    */
   public CsvWriterImpl(CsvWriterParameters csvWriterParameters) throws CsvWriterException {
 
+    addFileConfig(csvWriterParameters);
     this.csvRecordHeaderOrder = csvWriterParameters.getCsvRecordHeaderOrder();
     this.outputPath = generateOutputPath(csvWriterParameters);
     csvWriterParameters.getPathsBundle().addPath(outputPath);
     this.csvPrinter = createCsvPrinter(csvRecordHeaderOrder, outputPath);
 
+  }
+
+  private void addFileConfig(CsvWriterParameters csvWriterParameters) {
+    if (csvWriterParameters.getDelimiter() != null) {
+      this.delimiter = csvWriterParameters.getDelimiter();
+    }
+    if (csvWriterParameters.getEndOfLine() != null) {
+      this.endOfLine = csvWriterParameters.getEndOfLine();
+    }
+    if (csvWriterParameters.getCharset() != null) {
+      this.charset = csvWriterParameters.getCharset();
+    }
   }
 
   private Path generateOutputPath(CsvWriterParameters csvWriterParameters) {
@@ -124,8 +140,9 @@ public class CsvWriterImpl implements CsvWriter {
     }
     CSVFormat csvFormat = builder
         .setDelimiter(delimiter)
+        .setRecordSeparator(endOfLine)
         .build();
-    BufferedWriter bufferedWriter = Files.newBufferedWriter(outputPath);
+    BufferedWriter bufferedWriter = Files.newBufferedWriter(outputPath, charset);
 
     return new CSVPrinter(bufferedWriter, csvFormat);
 
@@ -146,7 +163,7 @@ public class CsvWriterImpl implements CsvWriter {
     return csvRecordHeaderOrder;
   }
 
-  public void setCsvRecordHeaderOrder (CsvRecordHeaderOrder csvRecordHeaderOrder)
+  public void setCsvRecordHeaderOrder(CsvRecordHeaderOrder csvRecordHeaderOrder)
       throws CsvWriterException {
     this.csvRecordHeaderOrder = csvRecordHeaderOrder;
     this.csvPrinter = createCsvPrinter(csvRecordHeaderOrder, outputPath);
@@ -160,13 +177,5 @@ public class CsvWriterImpl implements CsvWriter {
     }
   }
 
-  /**
-   * Set CSV file delimiter.
-   *
-   * @param delimiter CSV file delimiter.
-   */
-  public void setDelimiter(String delimiter) {
-    this.delimiter = delimiter;
-  }
 
 }

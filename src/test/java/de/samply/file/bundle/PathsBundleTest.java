@@ -3,7 +3,7 @@ package de.samply.file.bundle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.samply.utils.Constants;
+import de.samply.spring.MtbaConst;
 import de.samply.utils.EitherUtils.ThrowingConsumer;
 import de.samply.utils.RandomPathGenerator;
 import java.io.IOException;
@@ -64,7 +64,7 @@ class PathsBundleTest {
 
     for (Path path : pathsBundle.getAllPaths()) {
       for (String line : Files.readAllLines(path)) {
-        for (String element : line.split(Constants.DEFAULT_DELIMITER)) {
+        for (String element : line.split(MtbaConst.DEFAULT_CSV_DELIMITER)) {
           assertTrue(element.startsWith(LINE_ELEMENT_PREFIX));
         }
       }
@@ -88,10 +88,10 @@ class PathsBundleTest {
       List<String> newLines = new ArrayList<>();
       for (String line : Files.readAllLines(path)) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (String element : line.split(Constants.DEFAULT_DELIMITER)) {
+        for (String element : line.split(MtbaConst.DEFAULT_CSV_DELIMITER)) {
           stringBuilder.append(LINE_ELEMENT_PREFIX);
           stringBuilder.append(element);
-          stringBuilder.append(Constants.DEFAULT_DELIMITER);
+          stringBuilder.append(MtbaConst.DEFAULT_CSV_DELIMITER);
         }
         newLines.add(stringBuilder.toString());
       }

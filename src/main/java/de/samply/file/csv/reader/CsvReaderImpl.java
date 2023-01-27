@@ -3,9 +3,10 @@ package de.samply.file.csv.reader;
 import de.samply.file.bundle.PathsBundle;
 import de.samply.file.csv.CsvRecordHeaderValues;
 import de.samply.file.csv.CsvRecordHeaderValuesIterator;
-import de.samply.utils.Constants;
+import de.samply.spring.MtbaConst;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -22,7 +23,9 @@ public class CsvReaderImpl implements CsvReader {
 
   private final Reader reader;
   private final CsvReaderParameters csvReaderParameters;
-  private String delimiter = Constants.DEFAULT_DELIMITER;
+  private String delimiter = MtbaConst.DEFAULT_CSV_DELIMITER;
+  private String endOfLine = MtbaConst.DEFAULT_END_OF_LINE;
+  private Charset charset = MtbaConst.DEFAULT_CHARSET;
 
 
   public CsvReaderImpl(String filename, PathsBundle pathsBundle) throws CsvReaderException {
@@ -31,7 +34,20 @@ public class CsvReaderImpl implements CsvReader {
 
   public CsvReaderImpl(CsvReaderParameters csvReaderParameters) throws CsvReaderException {
     this.csvReaderParameters = csvReaderParameters;
+    setFileConfig(csvReaderParameters);
     this.reader = createReader(csvReaderParameters);
+  }
+
+  private void setFileConfig(CsvReaderParameters csvReaderParameters) {
+    if (csvReaderParameters.getCharset() != null) {
+      this.charset = csvReaderParameters.getCharset();
+    }
+    if (csvReaderParameters.getDelimiter() != null) {
+      this.delimiter = csvReaderParameters.getDelimiter();
+    }
+    if (csvReaderParameters.getEndOfLine() != null) {
+      this.endOfLine = csvReaderParameters.getEndOfLine();
+    }
   }
 
   /**
@@ -88,6 +104,7 @@ public class CsvReaderImpl implements CsvReader {
 
     return Builder.create()
         .setHeader()
+        .setRecordSeparator(endOfLine)
         .setSkipHeaderRecord(true)
         .setIgnoreEmptyLines(true)
         .setIgnoreHeaderCase(true)
@@ -100,20 +117,11 @@ public class CsvReaderImpl implements CsvReader {
 
     try {
       Path path = csvReaderParameters.getPath();
-      return Files.newBufferedReader(path);
+      return Files.newBufferedReader(path, charset);
     } catch (IOException e) {
       throw new CsvReaderException(e);
     }
 
-  }
-
-  /**
-   * Set delimiter of csv file.
-   *
-   * @param delimiter Csv file delimiter.
-   */
-  public void setDelimiter(String delimiter) {
-    this.delimiter = delimiter;
   }
 
   @Override
