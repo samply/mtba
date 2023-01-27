@@ -9,7 +9,7 @@ RUN mkdir /app/temp-files
 RUN chmod 777 /app/temp-files
 ENV TEMPORAL_DIRECTORY /app/temp-files
 ENV MUTATIONS_CSV_SCRIPT_INTERPRETER "python3"
-ENV NEW_FILES_DIRECTORY: "/app/input"
-ENV PERSIST_DIRECTORY: "/app/persist"
+ENV NEW_FILES_DIRECTORY "/app/input"
+ENV PERSIST_DIRECTORY "/app/persist"
 
 CMD ["java", "-jar", "mtba.jar"]
