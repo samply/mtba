@@ -261,6 +261,8 @@ public class FhirConverterDelegate implements JavaDelegate {
         scriptPath.toAbsolutePath().toString(),
         path.toAbsolutePath().toString(),
         outputPathsBundle.getPath(outputFilename).toAbsolutePath().toString());
+    processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+    processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
     Process process = processBuilder.start();
     logProcess(process);
     int statusCode = process.waitFor();
