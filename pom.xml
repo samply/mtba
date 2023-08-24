@@ -13,10 +13,10 @@
 
   <groupId>de.samply</groupId>
   <artifactId>mtba</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
   <name>mtba</name>
   <description>Samply MTBA is a library for the functionality of the project MTBA (Molecular Tumor
-    Board Association)
+    Board Alliance)
   </description>
   <url>https://github.com/samply/mtba</url>
 
@@ -77,19 +77,19 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <java.version>17</java.version>
-    <spring-boot.version>2.7.6</spring-boot.version>
+    <spring-boot.version>2.7.14</spring-boot.version>
     <camunda.version>7.18.0</camunda.version>
 
-    <commons-csv.version>1.9.0</commons-csv.version>
-    <commons-io.version>2.11.0</commons-io.version>
+    <commons-csv.version>1.10.0</commons-csv.version>
+    <commons-io.version>2.13.0</commons-io.version>
     <vavr.version>0.10.4</vavr.version>
-    <commons-net.version>3.8.0</commons-net.version>
+    <commons-net.version>3.9.0</commons-net.version>
     <junit-jupiter.version>5.8.2</junit-jupiter.version>
     <slf4j-api.version>1.7.36</slf4j-api.version>
     <log4j-slf4j-impl.version>2.18.0</log4j-slf4j-impl.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
-    <json.version>20220924</json.version>
-    <hapi.version>6.2.1</hapi.version>
+    <json.version>20230618</json.version>
+    <hapi.version>6.2.5</hapi.version>
     <ucum.version>1.0.3</ucum.version>
   </properties>
 
@@ -131,7 +131,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.14.1</version>
+      <version>2.14.3</version>
     </dependency>
 
     <dependency>
