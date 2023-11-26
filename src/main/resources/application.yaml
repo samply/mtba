@@ -4,3 +4,10 @@ spring.datasource.url: jdbc:h2:file:./camunda-h2-database
 camunda.bpm.admin-user:
   id: admin
   password: adminpass
+server:
+  servlet:
+    context-path: ${HTTP_RELATIVE_PATH}
+camunda:
+  bpm:
+    webapp:
+      application-path: ${HTTP_RELATIVE_PATH}/camunda
