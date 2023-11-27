@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - MUTATIONS_CSV_SCRIPT_INTERPRETER, NEW_FILES_DIRECTORY and PERSIST_DIRECTORY in Dockerfile
 - Apk upgrade in Dockerfile
 - HTTP_RELATIVE_PATH
+- Security Config for Keycloak
 
 ### Changed
 - Create temporal root directory if it does not exist
