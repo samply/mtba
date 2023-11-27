@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.0 - 2023-01-23]
+## [1.0.0 - 2023-11-27]
 ### Added
 - Paths Bundle, Paths Bundle Manager
 - SLF4J with log4j
@@ -38,6 +38,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Config for csv delimiter, eol and charset
 - MUTATIONS_CSV_SCRIPT_INTERPRETER, NEW_FILES_DIRECTORY and PERSIST_DIRECTORY in Dockerfile
 - Apk upgrade in Dockerfile
+- HTTP_RELATIVE_PATH
+- Security Config for Keycloak
 
 ### Changed
 - Create temporal root directory if it does not exist
+- Update to Spring 3.1.6

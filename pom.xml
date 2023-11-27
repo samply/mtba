@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.8</version>
+    <version>3.1.6</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -77,20 +77,18 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <java.version>17</java.version>
-    <spring-boot.version>2.7.14</spring-boot.version>
-    <camunda.version>7.18.0</camunda.version>
+    <spring-boot.version>3.1.6</spring-boot.version>
+    <camunda.version>7.20.0</camunda.version>
 
     <commons-csv.version>1.10.0</commons-csv.version>
-    <commons-io.version>2.13.0</commons-io.version>
+    <commons-io.version>2.15.0</commons-io.version>
     <vavr.version>0.10.4</vavr.version>
-    <commons-net.version>3.9.0</commons-net.version>
-    <junit-jupiter.version>5.8.2</junit-jupiter.version>
-    <slf4j-api.version>1.7.36</slf4j-api.version>
-    <log4j-slf4j-impl.version>2.18.0</log4j-slf4j-impl.version>
-    <commons-lang3.version>3.12.0</commons-lang3.version>
-    <json.version>20230618</json.version>
-    <hapi.version>6.2.5</hapi.version>
-    <ucum.version>1.0.3</ucum.version>
+    <commons-net.version>3.10.0</commons-net.version>
+    <junit-jupiter.version>5.10.1</junit-jupiter.version>
+    <commons-lang3.version>3.14.0</commons-lang3.version>
+    <json.version>20231013</json.version>
+    <hapi.version>6.10.0</hapi.version>
+    <ucum.version>1.0.8</ucum.version>
   </properties>
 
   <dependencyManagement>
@@ -131,7 +129,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.14.3</version>
+      <version>2.15.3</version>
     </dependency>
 
     <dependency>
@@ -149,18 +147,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.yaml</groupId>
-          <artifactId>snakeyaml</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- TODO: delete snakeyaml after spring update -->
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>1.33</version>
     </dependency>
 
     <dependency>
@@ -187,6 +173,29 @@
       <artifactId>spring-boot-starter-jdbc</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.extension</groupId>
+      <artifactId>camunda-platform-7-keycloak</artifactId>
+      <version>7.20.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.extension</groupId>
+      <artifactId>camunda-platform-7-keycloak-jwt</artifactId>
+      <version>7.20.1</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-csv</artifactId>
       <version>${commons-csv.version}</version>
@@ -195,16 +204,6 @@
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
       <version>${vavr.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j-api.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
-      <version>${log4j-slf4j-impl.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-net</groupId>

@@ -1,6 +1,54 @@
 server.port: 8480
-logging.level.root: ${LOG_LEVEL:INFO}
 spring.datasource.url: jdbc:h2:file:./camunda-h2-database
-camunda.bpm.admin-user:
-  id: admin
-  password: adminpass
+
+server:
+  servlet:
+    context-path: ${HTTP_RELATIVE_PATH:/}
+
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+
+camunda:
+  bpm:
+    webapp:
+      application-path: ${HTTP_RELATIVE_PATH:}/camunda
+    authorization:
+      enabled: true
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}
+            authorization-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth
+            token-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
+            user-info-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/userinfo
+            jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+            user-name-attribute: email
+        registration:
+          keycloak:
+            client-id: ${KEYCLOAK_CLIENT_ID}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET:}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - profile
+              - email
+
+plugin.identity.keycloak:
+  keycloakIssuerUrl: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+  keycloakAdminUrl: ${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}
+  clientId: ${KEYCLOAK_CLIENT_ID}
+  clientSecret: ${KEYCLOAK_CLIENT_SECRET:}
+  useEmailAsCamundaUserId: true
+  useUsernameAsCamundaUserId: false
+  useGroupPathAsCamundaGroupId: true
+  administratorGroupName: ${KEYCLOAK_ADMIN_GROUP}
+  disableSSLCertificateValidation: true
