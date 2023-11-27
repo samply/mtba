@@ -16,7 +16,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 It is required that the client has the following service account roles:
 - query-users
 - query-groups
-- view-users
+- view-users  
 (It is based on https://github.com/camunda-community-hub/camunda-platform-7-keycloak)
 
 
