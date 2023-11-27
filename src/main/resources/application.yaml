@@ -1,13 +1,15 @@
 server.port: 8480
-logging.level.root: ${LOG_LEVEL:INFO}
 spring.datasource.url: jdbc:h2:file:./camunda-h2-database
 camunda.bpm.admin-user:
   id: admin
   password: adminpass
 server:
   servlet:
-    context-path: ${HTTP_RELATIVE_PATH}
+    context-path: ${HTTP_RELATIVE_PATH:/}
 camunda:
   bpm:
     webapp:
-      application-path: ${HTTP_RELATIVE_PATH}/camunda
+      application-path: ${HTTP_RELATIVE_PATH:}/camunda
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
