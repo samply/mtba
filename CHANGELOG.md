@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.1.0 - 2023-11-27]
 ### Added
 - Found new files
+- history time to live
 
 ## [1.1.0 - 2023-11-27]
 ### Fixed
