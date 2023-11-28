@@ -12,7 +12,7 @@ logging:
 camunda:
   bpm:
     webapp:
-      application-path: ${HTTP_RELATIVE_PATH:}/camunda
+      application-path: /camunda
     authorization:
       enabled: true
 
