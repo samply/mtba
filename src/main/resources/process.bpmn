@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0fr9mxs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.16.0">
   <bpmn:process id="mtba" name="mtba" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="P30D">
-    <bpmn:extensionElements />
     <bpmn:sequenceFlow id="Flow_0ylx2z9" sourceRef="createPathsBundle" targetRef="Gateway_0f2qtgf" />
     <bpmn:sequenceFlow id="Flow_03aus3d" sourceRef="StartEvent_1" targetRef="createPathsBundle" />
     <bpmn:sequenceFlow id="Flow_1r7tunv" sourceRef="convertToFHIR" targetRef="exportToBlaze" />
