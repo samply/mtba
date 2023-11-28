@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.0 - 2023-11-28]
-### Added
+## [1.1.2 - 2023-11-28]
+### Fixed
+- Camunda Web application Path
 
 ## [1.1.1 - 2023-11-28]
 ### Changed: 
