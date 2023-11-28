@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 
 public class MtbaConst {
 
+  public static final String APP_NAME = "MTBA";
   // Other constants
   public static final String DEFAULT_CSV_DELIMITER = "\t";
   public static final String DEFAULT_END_OF_LINE = System.lineSeparator();
@@ -147,5 +148,7 @@ public class MtbaConst {
   public final static String PATHS_BUNDLE = "pathsBundle";
   public final static String IS_PATHS_BUNDLE_EMPTY = "isPathsBundleEmpty";
 
+  // REST-API Path
+  public final static String INFO = "/info";
 
 }

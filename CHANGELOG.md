@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.1.3 - 2023-11-28]
 ### Added
+- MTBA Version
 
 ## [1.1.2 - 2023-11-28]
 ### Fixed
