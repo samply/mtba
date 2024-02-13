@@ -49,6 +49,6 @@ plugin.identity.keycloak:
   clientSecret: ${KEYCLOAK_CLIENT_SECRET:}
   useEmailAsCamundaUserId: true
   useUsernameAsCamundaUserId: false
-  useGroupPathAsCamundaGroupId: true
+  useGroupPathAsCamundaGroupId: false
   administratorGroupName: ${KEYCLOAK_ADMIN_GROUP}
   disableSSLCertificateValidation: true
