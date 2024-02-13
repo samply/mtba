@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.1.4 - 2023-11-28]
-### Added
+### Changed
+- OIDC instead of KEYCLOAK
 
 ## [1.1.3 - 2023-11-28]
 ### Added
