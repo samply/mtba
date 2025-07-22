@@ -21,7 +21,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${OIDC_URL}/realms/${OIDC_REALM}
+          issuer-uri: ${OIDC_URL}
       client:
         provider:
           keycloak:
@@ -43,8 +43,8 @@ spring:
               - email
 
 plugin.identity.keycloak:
-  keycloakIssuerUrl: ${OIDC_URL}/realms/${OIDC_REALM}
-  keycloakAdminUrl: ${OIDC_URL}/admin/realms/${OIDC_REALM}
+  keycloakIssuerUrl: ${OIDC_URL}
+  keycloakAdminUrl: ${OIDC_ADMIN_URL}
   clientId: ${OIDC_CLIENT_ID}
   clientSecret: ${OIDC_CLIENT_SECRET:}
   useEmailAsCamundaUserId: true
