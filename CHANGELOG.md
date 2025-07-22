@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - OIDC instead of KEYCLOAK
 
+### Remove
+- Realm from OIDC configuration
+
 ## [1.1.3 - 2023-11-28]
 ### Added
 - MTBA Version
